@@ -304,6 +304,39 @@ class Formatter
   end
 
   def mention_html(account)
-    "<span class=\"h-card\"><a href=\"#{encode(TagManager.instance.url_for(account))}\" class=\"u-url mention\">@<span>#{encode(account.username)}</span></a></span>"
+    at_sign = '@'
+    username = account.username
+    case account.username
+    when 'bea'
+      username = 'codemom'
+      at_sign = '☕'
+    when 'Hypsoline'
+      username = 'Hypsolionne'
+      at_sign = '&amp;'
+    when 'wxcafe'
+      username = 'efacxw'
+      at_sign = '☕'
+    when 'gordon'
+      username = 'ziltoid'
+    when 'Gargron'
+      username = 'Gargamel'
+    when 'luluberlu', 'lulucybrelu'
+      username = '🐱🚬'
+    when 'Cyphergoat'
+      username = '🔐🐐'
+    when 'tarty'
+      username = 'flette'
+    when 'piks3l'
+      username = 'piksw4g'
+    when 'Doshirae'
+      username = 'Dorishae'
+    when 'CobaltVelvet', 'miou'
+      at_sign = '🔻'
+    when 'ary', 'cloeh', 'entropy', 'BrokenTropy'
+      at_sign = '🦝'
+    #else
+    #  username = 'luluberlu'
+    end
+    "<span class=\"h-card\"><a href=\"#{encode(TagManager.instance.url_for(account))}\" class=\"u-url mention\">#{at_sign}<span>#{encode(username)}</span></a></span>"
   end
 end
