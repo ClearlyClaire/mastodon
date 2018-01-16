@@ -43,45 +43,13 @@ module.exports = merge(sharedConfig, {
     chunkFilename: '[name]-[chunkhash].js',
   },
 
-  devtool: 'source-map', // separate sourcemap file, suitable for production
-  stats: 'normal',
+  //devtool: 'eval',
 
   optimization: {
-    minimize: true,
-    minimizer: [
-      new UglifyJsPlugin({
-        cache: true,
-        parallel: true,
-        sourceMap: true,
-
-        uglifyOptions: {
-          compress: {
-            warnings: false,
-          },
-
-          output: {
-            comments: false,
-          },
-        },
-      }),
-    ],
+    minimize: false,
   },
 
   plugins: [
-    new CompressionPlugin({
-      algorithm: compressionAlgorithm,
-      test: /\.(js|css|html|json|ico|svg|eot|otf|ttf)$/,
-    }),
-    new BundleAnalyzerPlugin({ // generates report.html and stats.json
-      analyzerMode: 'static',
-      generateStatsFile: true,
-      statsOptions: {
-        // allows usage with http://chrisbateman.github.io/webpack-visualizer/
-        chunkModules: true,
-      },
-      openAnalyzer: false,
-      logLevel: 'silent', // do not bother Webpacker, who runs with --json and parses stdout
-    }),
     new OfflinePlugin({
       publicPath: publicPath, // sw.js must be served from the root to avoid scope issues
       caches: {
@@ -120,7 +88,7 @@ module.exports = merge(sharedConfig, {
         cacheName: 'mastodon',
         output: '../assets/sw.js',
         publicPath: '/sw.js',
-        minify: true,
+        minify: false,
       },
     }),
   ],
