@@ -1,0 +1,5 @@
+@import 'index';
+
+.composer--options .fa-paperclip::before {
+  content: url('~images/paperclippy.svg');
+}

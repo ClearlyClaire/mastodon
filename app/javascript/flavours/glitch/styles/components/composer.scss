@@ -390,10 +390,6 @@
   border-radius: 0 0 4px 4px;
   height: 27px;
 
-  & .fa-paperclip::before {
-    content: url('~images/paperclippy.svg');
-  }
-
   & > * {
     display: inline-block;
     box-sizing: content-box;
