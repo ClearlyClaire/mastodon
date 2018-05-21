@@ -53,6 +53,11 @@ export default class StatusIcons extends React.PureComponent {
             aria-hidden='true'
           />
         ) : null}
+        {status.get('local_only') &&
+          <i
+            className={`fa fa-fw fa-home`}
+            aria-hidden='true'
+          />}
         {mediaIcon ? (
           <i
             className={`fa fa-fw fa-${mediaIcon} status__media-icon`}
