@@ -97,6 +97,7 @@ function mapStateToProps (state) {
     resetFileKey: state.getIn(['compose', 'resetFileKey']),
     sideArm: sideArmPrivacy,
     sideArmWarning: sideArmPrivacy && sideArmRestrictedPrivacy && privacyOrder.indexOf(sideArmPrivacy) < privacyOrder.indexOf(sideArmRestrictedPrivacy),
+    privacyWarning: replyPrivacy && privacyOrder.indexOf(state.getIn(['compose', 'privacy'])) < privacyOrder.indexOf(replyPrivacy),
     sensitive: state.getIn(['compose', 'sensitive']),
     showSearch: state.getIn(['search', 'submitted']) && !state.getIn(['search', 'hidden']),
     spoiler: spoilersAlwaysOn || state.getIn(['compose', 'spoiler']),
@@ -425,6 +426,7 @@ class Composer extends React.Component {
       onUndoUpload,
       onUpload,
       privacy,
+      privacyWarning,
       progress,
       inReplyTo,
       resetFileKey,
@@ -528,6 +530,7 @@ class Composer extends React.Component {
           onSecondarySubmit={handleSecondarySubmit}
           onSubmit={handleSubmit}
           privacy={privacy}
+          privacyWarning={privacyWarning}
           sideArm={sideArm}
           sideArmWarning={sideArmWarning}
         />
@@ -554,6 +557,7 @@ Composer.propTypes = {
   media: ImmutablePropTypes.list,
   preselectDate: PropTypes.instanceOf(Date),
   privacy: PropTypes.string,
+  privacyWarning: PropTypes.bool,
   progress: PropTypes.number,
   inReplyTo: ImmutablePropTypes.map,
   resetFileKey: PropTypes.number,
