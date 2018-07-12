@@ -51,7 +51,7 @@ import { me } from 'flavours/glitch/util/initial_state';
 import { isMobile } from 'flavours/glitch/util/is_mobile';
 import { assignHandlers } from 'flavours/glitch/util/react_helpers';
 import { wrap } from 'flavours/glitch/util/redux_helpers';
-import { privacyPreference } from 'flavours/glitch/util/privacy_preference';
+import { privacyPreference, order as privacyOrder } from 'flavours/glitch/util/privacy_preference';
 
 const messages = defineMessages({
   missingDescriptionMessage: {  id: 'confirmations.missing_media_description.message',
@@ -96,6 +96,7 @@ function mapStateToProps (state) {
     replyContent: inReplyTo ? state.getIn(['statuses', inReplyTo, 'contentHtml']) : null,
     resetFileKey: state.getIn(['compose', 'resetFileKey']),
     sideArm: sideArmPrivacy,
+    sideArmWarning: sideArmPrivacy && sideArmRestrictedPrivacy && privacyOrder.indexOf(sideArmPrivacy) < privacyOrder.indexOf(sideArmRestrictedPrivacy),
     sensitive: state.getIn(['compose', 'sensitive']),
     showSearch: state.getIn(['search', 'submitted']) && !state.getIn(['search', 'hidden']),
     spoiler: spoilersAlwaysOn || state.getIn(['compose', 'spoiler']),
@@ -430,6 +431,7 @@ class Composer extends React.Component {
       sensitive,
       showSearch,
       sideArm,
+      sideArmWarning,
       spoiler,
       spoilerText,
       suggestions,
@@ -527,6 +529,7 @@ class Composer extends React.Component {
           onSubmit={handleSubmit}
           privacy={privacy}
           sideArm={sideArm}
+          sideArmWarning={sideArmWarning}
         />
       </div>
     );
@@ -555,6 +558,7 @@ Composer.propTypes = {
   inReplyTo: ImmutablePropTypes.map,
   resetFileKey: PropTypes.number,
   sideArm: PropTypes.string,
+  sideArmWarning: PropTypes.bool,
   sensitive: PropTypes.bool,
   showSearch: PropTypes.bool,
   spoiler: PropTypes.bool,

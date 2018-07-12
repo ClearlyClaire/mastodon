@@ -36,6 +36,7 @@ export default function ComposerPublisher ({
   onSubmit,
   privacy,
   sideArm,
+  sideArmWarning,
 }) {
   const diff = maxChars - length(countText || '');
   const computedClass = classNames('composer--publisher', {
@@ -49,7 +50,7 @@ export default function ComposerPublisher ({
       <span className='count'>{diff}</span>
       {sideArm && sideArm !== 'none' ? (
         <Button
-          className='side_arm'
+          className={classNames('side_arm', {side_arm_warning: sideArmWarning})}
           disabled={disabled || diff < 0}
           onClick={onSecondarySubmit}
           style={{ padding: null }}
@@ -119,4 +120,5 @@ ComposerPublisher.propTypes = {
   onSubmit: PropTypes.func,
   privacy: PropTypes.oneOf(['direct', 'private', 'unlisted', 'public']),
   sideArm: PropTypes.oneOf(['none', 'direct', 'private', 'unlisted', 'public']),
+  sideArmWarning: PropTypes.bool,
 };
