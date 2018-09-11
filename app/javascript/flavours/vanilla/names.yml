@@ -14,3 +14,8 @@ pl:
   skins:
     vanilla:
       default: Domyślny
+fr:
+  flavours:
+    vanilla:
+      description: Blame Tixie
+      name: Mastodon Villani
