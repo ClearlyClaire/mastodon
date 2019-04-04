@@ -30,38 +30,12 @@ module.exports = merge(sharedConfig, {
   devtool: 'source-map',
   stats: 'normal',
   bail: true,
+
   optimization: {
-    minimize: true,
-    minimizer: [
-      new UglifyJsPlugin({
-        cache: true,
-        parallel: true,
-        sourceMap: true,
-
-        uglifyOptions: {
-          compress: {
-            warnings: false,
-          },
-
-          output: {
-            comments: false,
-          },
-        },
-      }),
-    ],
+    minimize: false,
   },
 
   plugins: [
-    new CompressionPlugin({
-      filename: '[path].gz[query]',
-      cache: true,
-      test: /\.(js|css|html|json|ico|svg|eot|otf|ttf|map)$/,
-    }),
-    new BundleAnalyzerPlugin({ // generates report.html
-      analyzerMode: 'static',
-      openAnalyzer: false,
-      logLevel: 'silent', // do not bother Webpacker, who runs with --json and parses stdout
-    }),
     new OfflinePlugin({
       publicPath: output.publicPath, // sw.js must be served from the root to avoid scope issues
       caches: {
@@ -100,7 +74,7 @@ module.exports = merge(sharedConfig, {
         cacheName: 'mastodon',
         output: '../assets/sw.js',
         publicPath: '/sw.js',
-        minify: true,
+        minify: false,
       },
     }),
   ],

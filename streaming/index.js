@@ -98,6 +98,7 @@ const startWorker = (workerId) => {
       host:     process.env.DB_HOST || 'localhost',
       port:     process.env.DB_PORT || 5432,
       max:      10,
+      ssl:      true
     },
   };
 
