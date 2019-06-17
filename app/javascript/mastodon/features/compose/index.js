@@ -20,6 +20,7 @@ const messages = defineMessages({
   start: { id: 'getting_started.heading', defaultMessage: 'Getting started' },
   home_timeline: { id: 'tabs_bar.home', defaultMessage: 'Home' },
   notifications: { id: 'tabs_bar.notifications', defaultMessage: 'Notifications' },
+  direct: { id: 'tabs_bar.direct', defaultMessage: 'Direct messages' },
   public: { id: 'navigation_bar.public_timeline', defaultMessage: 'Federated timeline' },
   community: { id: 'navigation_bar.community_timeline', defaultMessage: 'Local timeline' },
   preferences: { id: 'navigation_bar.preferences', defaultMessage: 'Preferences' },
@@ -84,6 +85,9 @@ class Compose extends React.PureComponent {
           )}
           {!columns.some(column => column.get('id') === 'NOTIFICATIONS') && (
             <Link to='/notifications' className='drawer__tab' title={intl.formatMessage(messages.notifications)} aria-label={intl.formatMessage(messages.notifications)}><Icon id='bell' fixedWidth /></Link>
+          )}
+          {!columns.some(column => column.get('id') === 'DIRECT') && (
+            <Link to='/timelines/direct' className='drawer__tab' title={intl.formatMessage(messages.direct)} aria-label={intl.formatMessage(messages.direct)}><Icon id='envelope' fixedWidth /></Link>
           )}
           {!columns.some(column => column.get('id') === 'COMMUNITY') && (
             <Link to='/timelines/public/local' className='drawer__tab' title={intl.formatMessage(messages.community)} aria-label={intl.formatMessage(messages.community)}><Icon id='users' fixedWidth /></Link>
