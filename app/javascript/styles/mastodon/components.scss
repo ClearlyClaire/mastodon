@@ -136,7 +136,7 @@
   &:hover,
   &:active,
   &:focus {
-    color: lighten($action-button-color, 7%);
+    color: lighten($action-button-color, 15%);
     transition: color 200ms ease-out;
   }
 
@@ -165,11 +165,11 @@
     &:hover,
     &:active,
     &:focus {
-      color: darken($lighter-text-color, 7%);
+      color: darken($lighter-text-color, 15%);
     }
 
     &.disabled {
-      color: lighten($lighter-text-color, 7%);
+      color: lighten($lighter-text-color, 15%);
     }
 
     &.active {
@@ -209,7 +209,7 @@
   &:hover,
   &:active,
   &:focus {
-    color: darken($lighter-text-color, 7%);
+    color: darken($lighter-text-color, 15%);
     transition: color 200ms ease-out;
   }
 
@@ -516,7 +516,7 @@
           &:hover,
           &:focus,
           &:active {
-            color: lighten($secondary-text-color, 7%);
+            color: lighten($secondary-text-color, 15%);
           }
         }
 
@@ -743,7 +743,7 @@
       text-decoration: underline;
 
       .fa {
-        color: lighten($dark-text-color, 7%);
+        color: lighten($dark-text-color, 15%);
       }
     }
 
@@ -770,7 +770,7 @@
     background: $action-button-color;
 
     &:hover {
-      background: lighten($action-button-color, 7%);
+      background: lighten($action-button-color, 15%);
       text-decoration: none;
     }
 
@@ -1465,7 +1465,7 @@ a.account__display-name {
     color: $inverted-text-color;
 
     &:hover {
-      background: lighten($ui-base-lighter-color, 7%);
+      background: lighten($ui-base-lighter-color, 15%);
       text-decoration: none;
     }
   }
@@ -2173,7 +2173,7 @@ a.account__display-name {
   &:hover,
   &:focus,
   &:active {
-    background: lighten($ui-highlight-color, 7%);
+    background: lighten($ui-highlight-color, 15%);
   }
 }
 
@@ -3134,7 +3134,7 @@ a.status-card.compact:hover {
   padding: 0 15px;
 
   &:hover {
-    color: lighten($darker-text-color, 7%);
+    color: lighten($darker-text-color, 15%);
   }
 
   &.active {
@@ -3989,7 +3989,7 @@ a.status-card.compact:hover {
     }
 
     &:hover {
-      color: lighten($action-button-color, 7%);
+      color: lighten($action-button-color, 15%);
     }
   }
 }
@@ -4996,7 +4996,7 @@ a.status-card.compact:hover {
       &:hover,
       &:active,
       &:focus {
-        color: lighten($darker-text-color, 7%);
+        color: lighten($darker-text-color, 15%);
       }
     }
 
