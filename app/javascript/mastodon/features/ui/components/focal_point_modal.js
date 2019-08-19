@@ -168,7 +168,7 @@ class FocalPointModal extends ImmutablePureComponent {
     fetchTesseract().then(({ TesseractWorker }) => {
       const worker = new TesseractWorker({
         workerPath: `${assetHost}/packs/ocr/worker.min.js`,
-        corePath: `${assetHost}/packs/ocr/tesseract-core.wasm.js`,
+        corePath: `/tesseract-worker.js`,
         langPath: `${assetHost}/ocr/lang-data`,
       });
 
