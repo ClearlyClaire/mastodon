@@ -25,7 +25,7 @@ class TesseractWorkerController < ActionController::Base
     assets_host   = Rails.configuration.action_controller.asset_host
     assets_host ||= host_to_url(base_host)
 
-    render :text => "importScripts('#{assetHost}/packs/ocr/tesseract-core.wasm.js')", :content_type => "text/javascript"
+    render :text => "importScripts('#{assets_host}/packs/ocr/tesseract-core.wasm.js')", :content_type => "text/javascript"
   end
 end
 
