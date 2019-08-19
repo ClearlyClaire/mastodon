@@ -156,7 +156,7 @@
     "stringz": "^2.0.0",
     "substring-trie": "^1.0.2",
     "terser-webpack-plugin": "^1.4.1",
-    "tesseract.js": "https://github.com/ThibG/tesseract.js#master",
+    "tesseract.js": "https://github.com/ThibG/tesseract.js#eb288fb885b0bb8a56e17b0e9396414df6713032",
     "throng": "^4.0.0",
     "tiny-queue": "^0.2.1",
     "uuid": "^3.1.0",
