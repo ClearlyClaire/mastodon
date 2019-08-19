@@ -170,6 +170,7 @@ class FocalPointModal extends ImmutablePureComponent {
         workerPath: `${assetHost}/packs/ocr/worker.min.js`,
         corePath: `/tesseract-worker.js`,
         langPath: `${assetHost}/ocr/lang-data`,
+        preventBlobURL: true,
       });
 
       worker.recognize(media.get('url'))

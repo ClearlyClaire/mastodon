@@ -9988,10 +9988,9 @@ tesseract.js-utils@^1.0.0-beta.8:
     is-url "^1.2.4"
     zlibjs "^0.3.1"
 
-tesseract.js@^2.0.0-alpha.13:
+"tesseract.js@https://github.com/ThibG/tesseract.js#master":
   version "2.0.0-alpha.13"
-  resolved "https://registry.yarnpkg.com/tesseract.js/-/tesseract.js-2.0.0-alpha.13.tgz#87bb3d71fe646c0993b073552241d203d9dfef3a"
-  integrity sha512-ZFEdak7jWtN5vIDwZcw8OdAqA7RvG0QRailZKQFS5rtnl/Yy5vC4WcqfJh9+o+cA3bdr2zV5SENoWDtEihlSVA==
+  resolved "https://github.com/ThibG/tesseract.js#d1abf151eb16f256fada98e34c98251f24bb3f2b"
   dependencies:
     axios "^0.18.0"
     check-types "^7.4.0"
