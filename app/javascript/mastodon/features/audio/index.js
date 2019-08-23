@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
-import { fromJS, is } from 'immutable';
+import { is } from 'immutable';
 import { throttle } from 'lodash';
 import classNames from 'classnames';
 import { displayMedia, useBlurhash } from '../../initial_state';
 import Icon from 'mastodon/components/icon';
 import { decode } from 'blurhash';
-import { getPointerPosition } from 'mastodon/features/video';   
+import { getPointerPosition } from 'mastodon/features/video';
 
 const messages = defineMessages({
   play: { id: 'video.play', defaultMessage: 'Play' },
@@ -33,13 +33,10 @@ export default @injectIntl
 class Audio extends React.PureComponent {
 
   static propTypes = {
-    preview: PropTypes.string,
     src: PropTypes.string.isRequired,
     alt: PropTypes.string,
     sensitive: PropTypes.bool,
     startTime: PropTypes.number,
-    onOpenVideo: PropTypes.func,
-    onCloseVideo: PropTypes.func,
     detailed: PropTypes.bool,
     inline: PropTypes.bool,
     editable: PropTypes.bool,
@@ -253,7 +250,7 @@ class Audio extends React.PureComponent {
   }
 
   render () {
-    const { preview, src, inline, startTime, onOpenVideo, onCloseVideo, intl, alt, detailed, sensitive, link, editable } = this.props;
+    const { src, inline, startTime, intl, alt, detailed, sensitive, link, editable } = this.props;
     const { currentTime, duration, volume, buffer, dragging, paused, muted, revealed } = this.state;
     const progress = (currentTime / duration) * 100;
 
@@ -348,7 +345,7 @@ class Audio extends React.PureComponent {
             </div>
 
             <div className='video-player__buttons right'>
-              {(!onCloseVideo && !editable) && <button type='button' aria-label={intl.formatMessage(messages.hide)} onClick={this.toggleReveal}><Icon id='eye-slash' fixedWidth /></button>}
+              {(!editable) && <button type='button' aria-label={intl.formatMessage(messages.hide)} onClick={this.toggleReveal}><Icon id='eye-slash' fixedWidth /></button>}
             </div>
           </div>
         </div>
