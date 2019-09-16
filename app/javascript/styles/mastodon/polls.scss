@@ -67,6 +67,16 @@
     }
   }
 
+  &__option__text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__option__text__expanded {
+    white-space: normal;
+  }
+
   &__input {
     display: inline-block;
     position: relative;

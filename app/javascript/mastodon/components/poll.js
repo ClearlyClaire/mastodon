@@ -32,6 +32,7 @@ class Poll extends ImmutablePureComponent {
 
   state = {
     selected: {},
+    expanded: {},
   };
 
   handleOptionChange = e => {
@@ -50,6 +51,14 @@ class Poll extends ImmutablePureComponent {
       tmp[value] = true;
       this.setState({ selected: tmp });
     }
+  };
+
+  handleOptionToggleExpanded = (optionIndex) => {
+    this.setState((state) => {
+      const expanded = { ...state.expanded };
+      expanded[`${optionIndex}`] = !expanded[`${optionIndex}`];
+      return { expanded };
+    });
   };
 
   handleVote = () => {
@@ -73,6 +82,7 @@ class Poll extends ImmutablePureComponent {
     const percent            = poll.get('votes_count') === 0 ? 0 : (option.get('votes_count') / poll.get('votes_count')) * 100;
     const leading            = poll.get('options').filterNot(other => other.get('title') === option.get('title')).every(other => option.get('votes_count') > other.get('votes_count'));
     const active             = !!this.state.selected[`${optionIndex}`];
+    const expanded           = !!this.state.expanded[`${optionIndex}`];
     const showResults        = poll.get('voted') || poll.get('expired');
 
     let titleEmojified = option.get('title_emojified');
@@ -104,7 +114,12 @@ class Poll extends ImmutablePureComponent {
           {!showResults && <span className={classNames('poll__input', { checkbox: poll.get('multiple'), active })} />}
           {showResults && <span className='poll__number'>{Math.round(percent)}%</span>}
 
-          <span dangerouslySetInnerHTML={{ __html: titleEmojified }} />
+          <span
+            className={classNames('poll__option__text', { 'poll__option__text__expanded': expanded })}
+            title={option.get('title')}
+            dangerouslySetInnerHTML={{ __html: titleEmojified }}
+            onClick={this.handleOptionToggleExpanded.bind(this, optionIndex)}
+          />
         </label>
       </li>
     );
