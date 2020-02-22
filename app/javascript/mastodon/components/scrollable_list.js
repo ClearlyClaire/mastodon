@@ -135,6 +135,7 @@ export default class ScrollableList extends PureComponent {
   componentDidMount () {
     this.attachScrollListener();
     this.attachIntersectionObserver();
+    this.attachMutationObserver();
 
     attachFullscreenListener(this.onFullScreenChange);
 
@@ -169,16 +170,7 @@ export default class ScrollableList extends PureComponent {
   }
 
   getSnapshotBeforeUpdate (prevProps) {
-    const someItemInserted = React.Children.count(prevProps.children) > 0 &&
-      React.Children.count(prevProps.children) < React.Children.count(this.props.children) &&
-      this.getFirstChildKey(prevProps) !== this.getFirstChildKey(this.props);
-    const pendingChanged = (prevProps.numPending > 0) !== (this.props.numPending > 0);
-
-    if (pendingChanged || someItemInserted && (this.getScrollTop() > 0 || this.mouseMovedRecently)) {
-      return this.getScrollHeight() - this.getScrollTop();
-    } else {
-      return null;
-    }
+    return null;
   }
 
   componentDidUpdate (prevProps, prevState, snapshot) {
@@ -210,7 +202,6 @@ export default class ScrollableList extends PureComponent {
   attachIntersectionObserver () {
     let nodeOptions = {
       root: this.node,
-      rootMargin: '300% 0px',
     };
 
     this.intersectionObserverWrapper
@@ -219,6 +210,47 @@ export default class ScrollableList extends PureComponent {
 
   detachIntersectionObserver () {
     this.intersectionObserverWrapper.disconnect();
+  }
+
+  attachMutationObserver () {
+    this.mutationObserver = new MutationObserver(this._handleMutationObserver);
+    this.mutationObserver.observe(this.node, { attributes: true, attributeFilter: ['style', 'class'], characterData: false, subtree: true, childList: true });
+  }
+
+  detachMutationObserver () {
+    if (this.mutationObserver) this.mutationObserver.disconnect();
+    this.mutationObserver = null;
+  }
+
+  _handleMutationObserver = () => {
+    if (this.getScrollTop() == 0 && !this.mouseMovedRecently) {
+      return;
+    }
+
+    // Find anchor
+    const root = this.node.firstElementChild;
+    if (!root) return;
+
+    let anchor = null;
+    for (let i = 0; i < root.children.length; i++) {
+      if (!root.children[i].hasAttribute('style')) {
+        anchor = root.children[i];
+        break;
+      }
+    }
+
+    if (!anchor) {
+      return;
+    }
+
+    // Schedule fix
+    const offset = anchor.offsetTop;
+    requestAnimationFrame(() => {
+      const newOffset = anchor.offsetTop;
+      if (newOffset != offset) {
+        this.setScrollTop(this.getScrollTop() + offset);
+      }
+    });
   }
 
   attachScrollListener () {
