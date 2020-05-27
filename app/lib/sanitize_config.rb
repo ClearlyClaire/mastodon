@@ -67,7 +67,7 @@ class Sanitize
     end
 
     UNSUPPORTED_HREF_TRANSFORMER = lambda do |env|
-      return unless env[:node_name] == 'a' and env[:node]['href']
+      return unless env[:node_name] == 'a'
 
       current_node = env[:node]
 
