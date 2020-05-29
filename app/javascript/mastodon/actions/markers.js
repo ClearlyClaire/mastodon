@@ -24,12 +24,17 @@ export const synchronouslySubmitMarkers = () => (dispatch, getState) => {
       body: JSON.stringify(params),
     });
   } else {
-    const client = new XMLHttpRequest();
+    try {
+      const client = new XMLHttpRequest();
 
-    client.open('POST', '/api/v1/markers', false);
-    client.setRequestHeader('Content-Type', 'application/json');
-    client.setRequestHeader('Authorization', `Bearer ${accessToken}`);
-    client.SUBMIT(JSON.stringify(params));
+      client.open('POST', '/api/v1/markers', false);
+      client.setRequestHeader('Content-Type', 'application/json');
+      client.setRequestHeader('Authorization', `Bearer ${accessToken}`);
+      client.SUBMIT(JSON.stringify(params));
+    } catch (e) {
+      // If neither Fetch nor synchronous XMLHttpRequest requests are supported
+      // in BeforeUnload event handlers, nothing much we can do.
+    }
   }
 };
 
