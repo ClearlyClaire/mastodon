@@ -17,6 +17,7 @@ import { fetchFilters } from '../../actions/filters';
 import { clearHeight } from '../../actions/height_cache';
 import { focusApp, unfocusApp } from 'mastodon/actions/app';
 import { synchronouslySubmitMarkers } from 'mastodon/actions/markers';
+import { synchronouslySaveSettings } from 'mastodon/actions/settings';
 import { WrappedSwitch, WrappedRoute } from './util/react_router_helpers';
 import UploadArea from './components/upload_area';
 import ColumnsAreaContainer from './containers/columns_area_container';
@@ -251,6 +252,7 @@ class UI extends React.PureComponent {
   handleBeforeUnload = e => {
     const { intl, dispatch, isComposing, hasComposingText, hasMediaAttachments } = this.props;
 
+    dispatch(synchronouslySaveSettings());
     dispatch(synchronouslySubmitMarkers());
 
     if (isComposing && (hasComposingText || hasMediaAttachments)) {
