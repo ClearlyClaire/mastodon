@@ -1,6 +1,6 @@
 import classNames from 'classnames';
 import React from 'react';
-import { HotKeys } from 'react-hotkeys';
+import { GlobalHotKeys, HotKeys } from 'react-hotkeys';
 import { defineMessages, injectIntl } from 'react-intl';
 import { connect } from 'react-redux';
 import { Redirect, withRouter } from 'react-router-dom';
@@ -373,12 +373,6 @@ class UI extends React.PureComponent {
     setTimeout(() => this.props.dispatch(fetchFilters()), 500);
   }
 
-  componentDidMount () {
-    this.hotkeys.__mousetrap__.stopCallback = (e, element) => {
-      return ['TEXTAREA', 'SELECT', 'INPUT'].includes(element.tagName);
-    };
-  }
-
   componentWillUnmount () {
     window.removeEventListener('focus', this.handleWindowFocus);
     window.removeEventListener('blur', this.handleWindowBlur);
@@ -444,10 +438,6 @@ class UI extends React.PureComponent {
     } else {
       this.context.router.history.goBack();
     }
-  }
-
-  setHotkeysRef = c => {
-    this.hotkeys = c;
   }
 
   handleHotkeyToggleHelp = () => {
@@ -532,7 +522,8 @@ class UI extends React.PureComponent {
     };
 
     return (
-      <HotKeys keyMap={keyMap} handlers={handlers} ref={this.setHotkeysRef} attach={window} focused>
+      <HotKeys keyMap={keyMap} handlers={handlers}>
+        <GlobalHotKeys keyMap={keyMap} handlers={handlers} />
         <div className={classNames('ui', { 'is-composing': isComposing })} ref={this.setRef} style={{ pointerEvents: dropdownMenuIsOpen ? 'none' : null }}>
           <SwitchingColumnsArea location={location} onLayoutChange={this.handleLayoutChange}>
             {children}
