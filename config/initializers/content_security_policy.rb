@@ -36,11 +36,13 @@ Rails.application.config.content_security_policy do |p|
     p.worker_src  :self, :blob, assets_host
   else
     p.connect_src :self, :data, :blob, assets_host, media_host, Rails.configuration.x.streaming_api_base_url
-    p.script_src  :self, assets_host
+    p.script_src  :self, assets_host, :strict_dynamic
     p.child_src   :self, :blob, assets_host
     p.worker_src  :self, :blob, assets_host
   end
 end
+
+Rails.application.config.content_security_policy_nonce_generator = -> request { SecureRandom.base64(16) }
 
 # Report CSP violations to a specified URI
 # For further information see the following documentation:
@@ -50,4 +52,8 @@ end
 PgHero::HomeController.content_security_policy do |p|
   p.script_src :self, :unsafe_inline, assets_host
   p.style_src  :self, :unsafe_inline, assets_host
+end
+
+PgHero::HomeController.after_action do
+  request.content_security_policy_nonce_generator = nil
 end
