@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import IconButton from './icon_button';
-import Overlay from 'react-overlays/lib/Overlay';
+import Overlay from 'react-overlays/Overlay';
 import Motion from '../features/ui/util/optional_motion';
 import spring from 'react-motion/lib/spring';
 import detectPassiveEvents from 'detect-passive-events';
@@ -286,7 +286,9 @@ export default class Dropdown extends React.PureComponent {
         />
 
         <Overlay show={open} placement={dropdownPlacement} target={this.findTarget}>
-          <DropdownMenu items={items} onClose={this.handleClose} openedViaKeyboard={openedViaKeyboard} />
+          {({ props, arrowProps, placement }) => (
+            <DropdownMenu {...props} placement={placement} items={items} onClose={this.handleClose} openedViaKeyboard={openedViaKeyboard} />
+          )}
         </Overlay>
       </div>
     );
