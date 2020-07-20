@@ -9,8 +9,8 @@ module Localized
 
   def set_locale
     locale   = current_user.locale if respond_to?(:user_signed_in?) && user_signed_in?
-    locale ||= session[:locale] ||= default_locale
-    locale   = default_locale unless I18n.available_locales.include?(locale.to_sym)
+    locale ||= session[:locale]
+    locale   = default_locale unless locale.present? && I18n.available_locales.include?(locale.to_sym)
 
     I18n.with_locale(locale) do
       yield
@@ -23,7 +23,7 @@ module Localized
     if ENV['DEFAULT_LOCALE'].present?
       I18n.default_locale
     else
-      request_locale || I18n.default_locale
+      session[:locale] = request_locale || I18n.default_locale
     end
   end
 
