@@ -14,4 +14,5 @@
 class UserInviteRequest < ApplicationRecord
   belongs_to :user, inverse_of: :invite_request
   validates :text, presence: true, length: { maximum: 420 }
+  validates :text, format: { without: Regexp.new(Setting.invite_text_filter), message: I18n.t('users.invalid_invite_request_text') }, if: -> { Setting.invite_text_filter.present? }
 end

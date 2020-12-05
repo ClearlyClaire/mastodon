@@ -80,6 +80,7 @@ class User < ApplicationRecord
 
   has_one :invite_request, class_name: 'UserInviteRequest', inverse_of: :user, dependent: :destroy
   accepts_nested_attributes_for :invite_request, reject_if: ->(attributes) { attributes['text'].blank? }
+  validates :invite_request, presence: true, on: :create, if: -> { Setting.require_invite_text }
 
   validates :locale, inclusion: I18n.available_locales.map(&:to_s), if: :locale?
   validates_with BlacklistedEmailValidator, on: :create
