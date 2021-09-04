@@ -27,6 +27,18 @@ class ActivityPub::ActivityPresenter < ActiveModelSerializers::Model
       end
     end
 
+    def from_status_edit(status_edit)
+      new.tap do |presenter|
+        presenter.id = ActivityPub::TagManager.instance.activity_uri_for(status_edit)
+        presenter.type = 'Update'
+        presenter.actor = ActivityPub::TagManager.instance.uri_for(status_edit.status.account)
+        presenter.published = status_edit.created_at
+        presenter.to = ActivityPub::TagManager.instance.to(status_edit.status)
+        presenter.cc = ActivityPub::TagManager.instance.cc(status_edit.status)
+        presenter.virtual_object = status_edit.status.proper
+      end
+    end
+
     def from_encrypted_message(encrypted_message)
       new.tap do |presenter|
         presenter.id = ActivityPub::TagManager.instance.generate_uri_for(nil)

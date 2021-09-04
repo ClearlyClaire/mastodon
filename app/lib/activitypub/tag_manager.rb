@@ -53,9 +53,16 @@ class ActivityPub::TagManager
   end
 
   def activity_uri_for(target)
-    raise ArgumentError, 'target must be a local activity' unless %i(note comment activity).include?(target.object_type) && target.local?
+    raise ArgumentError, 'Activity must be of local origin' unless target.local?
 
-    activity_account_status_url(target.account, target)
+    case target.class.name
+    when 'Status'
+      activity_account_status_url(target.account, target)
+    when 'StatusEdit'
+      activity_account_status_url(target.status.account, target.status, target)
+    else
+      raise ArgumentError, "Unsupported activity object of class #{target.class.name}"
+    end
   end
 
   def replies_uri_for(target, page_params = nil)
