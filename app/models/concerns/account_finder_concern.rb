@@ -12,6 +12,10 @@ module AccountFinderConcern
       find_remote(username, domain) || raise(ActiveRecord::RecordNotFound)
     end
 
+    def find_local_or_remote!(username, domain)
+      find_local_or_remote(username, domain) || raise(ActiveRecord::RecordNotFound)
+    end
+
     def representative
       Account.find(-99)
     rescue ActiveRecord::RecordNotFound
@@ -25,7 +29,28 @@ module AccountFinderConcern
     def find_remote(username, domain)
       AccountFinder.new(username, domain).account
     end
+
+    def find_local_or_remote(username, domain)
+      TagManager.instance.local_domain?(domain) ? find_local(username) : find_remote(username, domain)
+    end
+
+    def validate_account_string!(account_string)
+      match = ACCOUNT_STRING_RE.match(account_string)
+      raise Mastodon::SyntaxError if match.nil? || match[:username].nil?
+
+      [match[:username], match[:domain]]
+    end
   end
+
+  # TODO: where should this go?
+  #
+  # this is adapted from MENTION_RE to
+  #   + capture only a mention,
+  #   + not require the mention to begin with an @,
+  #   + not match if there is anything surrounding the mention, and
+  #   + add named subgroup matches
+  # it would be ideal to explicitly refer to MENTION_RE, or a more fundamental regexp that we refactor MENTION_RE to incorporate
+  ACCOUNT_STRING_RE = /^@?(?<username>#{Account::USERNAME_RE})(?:@(?<domain>[[:word:]\.\-]+[[:word:]]+))?$/i
 
   class AccountFinder
     attr_reader :username, :domain

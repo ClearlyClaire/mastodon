@@ -11,6 +11,16 @@ class Api::V2::SearchController < Api::BaseController
   def index
     @search = Search.new(search_results)
     render json: @search, serializer: REST::SearchSerializer
+
+  # TODO: in the front end, these will show a toast that is only barely helpful
+  # TODO: semantics?
+
+  # user searched with a prefix that does exist
+  rescue Mastodon::SyntaxError
+    unprocessable_entity
+  # user searched for posts from an account the instance is not aware of
+  rescue ActiveRecord::NotFound
+    not_found
   end
 
   private
