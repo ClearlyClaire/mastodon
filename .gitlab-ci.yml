@@ -1,0 +1,128 @@
+image: ruby:3.0.3
+
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+
+stages:
+  - diff
+  - build
+  - test
+
+variables:
+  CONTINUOUS_INTEGRATION: "true" # not sure what this does…
+  DB_HOST: postgres
+  DB_USER: $POSTGRES_USER
+  DB_PASS: $POSTGRES_PASSWORD
+  DB_NAME: $POSTGRES_DB
+  DB_PORT: 5432
+  DISABLE_SIMPLECOV: "true" # not sure what this does…
+  NODEJS_SOURCE: https://deb.nodesource.com/setup_16.x # NodeJS 16
+  POSTGRES_DB: $POSTGRES_DB
+  POSTGRES_USER: $POSTGRES_USER
+  POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+  POSTGRES_HOST_AUTH_METHOD: trust
+  RAILS_ENV: test
+  REDIS_HOST: redis
+  REDIS_PORT: 6379
+
+services:
+  - redis:6.2-alpine
+  - postgres:14-alpine
+
+cache:
+  - key:
+      files:
+        - Gemfile.lock
+    paths:
+      - vendor/ruby
+  - key:
+      files:
+        - yarn.lock
+    paths:
+      - .yarn-cache/
+
+before_script:
+  - curl -fsSL $NODEJS_SOURCE | bash -
+  - alias node=nodejs
+  - apt-get update -q && apt-get install -yqq git libicu-dev libidn11-dev nodejs
+  - corepack enable && yarn set version latest
+  - bundle config set path 'vendor'
+  - bundle config without 'development production'
+  - ruby -v
+  - bundle install -j $(nproc)
+  - yarn --version
+  - echo 'yarn-offline-mirror ".yarn-cache/"' >> .yarnrc
+  - echo 'yarn-offline-mirror-pruning true' >> .yarnrc
+  - yarn install --frozen-lockfile --no-progress
+
+diff:
+  image: denoland/deno:latest
+  stage: diff
+  before_script: []
+  script:
+    - >
+      deno eval "
+      import response from 'https://gitlab.com/api/v4/projects/$CI_MERGE_REQUEST_PROJECT_ID/merge_requests/$CI_MERGE_REQUEST_IID/changes' assert { type: 'json' };
+      const { all, rb, js } = [
+        ...function* () {
+          for (const change of response.changes) {
+            const path = change.new_path;
+            if (change.deleted_file) ;
+            else yield path;
+          }
+        }(),
+      ].reduce(
+        ({ all, rb, js }, change) => {
+          all.push(change);
+          if (/[.]rb$/.test(change)) rb.push(change);
+          else if (/[.]js$/.test(change)) js.push(change);
+          return { all, rb, js };
+        },
+        { all: [], rb: [], js: [] },
+      );
+      Deno.writeTextFileSync(
+        'build.env',
+        'CHANGED_FILES=' + all.join(' ') + String.fromCodePoint(0x0A) +
+          'CHANGED_RUBY=' + rb.join(' ') + String.fromCodePoint(0x0A) +
+          'CHANGED_JS=' + js.join(' ') + String.fromCodePoint(0x0A),
+      );"
+    - cat build.env
+  artifacts:
+    reports:
+      dotenv: build.env
+
+build:
+  stage: build
+  script:
+    - ./bin/rails assets:precompile
+  artifacts:
+    name: assets
+    expire_in: 1 week
+    paths:
+      - public/assets
+      - public/packs-test
+
+lint:
+  stage: test
+  script:
+    - 'if [ ! -z "$CHANGED_RUBY" ]; then bundle exec standardrb $CHANGED_RUBY; fi'
+  allow_failure: true
+
+test:
+  stage: test
+  dependencies:
+    - build
+  variables:
+    RAILS_ENV: test
+  script:
+    - apt-get install -yqq ffmpeg imagemagick libpam-dev
+    - ./bin/rails db:create db:schema:load db:seed
+    - bundle exec rspec --format progress --format RspecJunitFormatter --out rspec.xml
+  artifacts:
+    when: always
+    paths:
+      - rspec.xml
+    reports:
+      junit:
+        - rspec.xml
