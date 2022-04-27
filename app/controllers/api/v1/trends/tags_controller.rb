@@ -13,14 +13,40 @@ class Api::V1::Trends::TagsController < Api::BaseController
 
   private
 
+  # Retrieve a comma-separated list of tags from the environment variable
+  # `ALWAYS_TRENDING_TAGS`, which will always be reported as trending by
+  # {#index}.
+  #
+  # `ALWAYS_TRENDING_TAGS` ought to match something like
+  # `/^(?:[^[:space]]+,)*[^[:space]]+,?$/i`, but we do not (yet?) enforce
+  # this. `ALWAYS_TRENDING_TAGS=Lune,Yuki,Baron,` is parsed as
+  # `['Lune', 'Yuki', 'Baron']`, the same as without the final comma.
+  #
+  # @return [ActiveRecord::Relation] The tags that will always be trending
+  def always_trending
+    # TODO: do we need to sanitize ALWAYS_TRENDING_TAGS?
+    # TODO: should we log when ALWAYS_TRENDING_TAGS includes a tag that does not exist?
+    # TODO: can we get the empty Relation without searching for (what we hope is) an impossible id?
+    ENV['ALWAYS_TRENDING_TAGS'].to_s.split(',')
+                                    .reduce(Tag.none) { |relation, tag_name| relation.or(Tag.where(name: tag_name)) }
+  end
+
+  # Determine the tags that will be reported as trending, overriding the
+  # `limit` param if {#always_trending} renders it necessary.
+  #
+  # Note that having too many tags always trending will render {#index}
+  # completely deterministic (as per {#BaseController::limit_param})!
+  # TODO: is that desirable? should we log a warning in that case?
   def set_tags
-    @tags = begin
-      if Setting.trends
-        Trends.tags.query.allowed.offset(offset_param).limit(limit_param(DEFAULT_TAGS_LIMIT))
-      else
-        []
-      end
-    end
+    @tags = if !Setting.trends
+              []
+            else
+              guaranteed_tags              = always_trending
+              # TODO: how does the query handle negative limits? is this necessary?
+              limit_considering_guaranteed = [0, limit_param(DEFAULT_TAGS_LIMIT) - guaranteed_tags.size].max
+
+              guaranteed_tags | Trends.tags.query.allowed.offset(offset_param).limit(limit_considering_guaranteed)
+            end
   end
 
   def insert_pagination_headers
