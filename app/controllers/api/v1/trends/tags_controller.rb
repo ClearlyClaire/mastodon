@@ -13,6 +13,10 @@ class Api::V1::Trends::TagsController < Api::BaseController
 
   private
 
+  def enabled?
+    Setting.trends
+  end
+
   # Retrieve a comma-separated list of tags from the environment variable
   # `ALWAYS_TRENDING_TAGS`, which will always be reported as trending by
   # {#index}.
@@ -37,16 +41,21 @@ class Api::V1::Trends::TagsController < Api::BaseController
   # Note that having too many tags always trending will render {#index}
   # completely deterministic (as per {#BaseController::limit_param})!
   # TODO: is that desirable? should we log a warning in that case?
+
   def set_tags
-    @tags = if !Setting.trends
+    @tags = if !enabled?
               []
             else
               guaranteed_tags              = always_trending
               # TODO: how does the query handle negative limits? is this necessary?
               limit_considering_guaranteed = [0, limit_param(DEFAULT_TAGS_LIMIT) - guaranteed_tags.size].max
 
-              guaranteed_tags | Trends.tags.query.allowed.offset(offset_param).limit(limit_considering_guaranteed)
+              guaranteed_tags | tags_from_trends.offset(offset_param).limit(limit_considering_guaranteed)
             end
+  end
+
+  def tags_from_trends
+    Trends.tags.query.allowed
   end
 
   def insert_pagination_headers
