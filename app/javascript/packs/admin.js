@@ -2,25 +2,6 @@ import './public-path';
 import ready from '../mastodon/ready';
 
 ready(() => {
-  const domainBlockSeverityInput = document.getElementById('domain_block_severity');
-  if (domainBlockSeverityInput) onDomainBlockSeverityChange(domainBlockSeverityInput);
-
-  const enableBootstrapTimelineAccounts = document.getElementById('form_admin_settings_enable_bootstrap_timeline_accounts');
-  if (enableBootstrapTimelineAccounts) onEnableBootstrapTimelineAccountsChange(enableBootstrapTimelineAccounts);
-
-  const registrationMode = document.getElementById('form_admin_settings_registrations_mode');
-  if (registrationMode) onChangeRegistrationMode(registrationMode);
-
-  document.querySelector('a#add-instance-button')?.addEventListener('click', (e) => {
-    const domain = document.getElementById('by_domain')?.value;
-
-    if (domain) {
-      const url = new URL(event.target.href);
-      url.searchParams.set('_domain', domain);
-      e.target.href = url;
-    }
-  });
-
   const React    = require('react');
   const ReactDOM = require('react-dom');
 
