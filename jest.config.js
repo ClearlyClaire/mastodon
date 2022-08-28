@@ -10,6 +10,7 @@ module.exports = {
     '<rootDir>/log/',
     '<rootDir>/public/',
     '<rootDir>/tmp/',
+    '<rootDir>/app/javascript/themes/',
   ],
   'setupFiles': [
     'raf/polyfill',
