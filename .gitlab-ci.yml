@@ -82,15 +82,20 @@ diff:
         { all: [], rb: [], js: [] },
       );
       Deno.writeTextFileSync(
-        'build.env',
-        'CHANGED_FILES=' + all.join(' ') + String.fromCodePoint(0x0A) +
-          'CHANGED_RUBY=' + rb.join(' ') + String.fromCodePoint(0x0A) +
-          'CHANGED_JS=' + js.join(' ') + String.fromCodePoint(0x0A),
+        'diff-all.txt', all.join(' ') + String.fromCodePoint(0x0A)
+      );
+      Deno.writeTextFileSync(
+        'diff-rb.txt', rb.join(' ') + String.fromCodePoint(0x0A)
+      );
+      Deno.writeTextFileSync(
+        'diff-js.txt', js.join(' ') + String.fromCodePoint(0x0A)
       );"
-    - cat build.env
+    - 'cat diff-*.txt'
   artifacts:
-    reports:
-      dotenv: build.env
+    paths:
+      - diff-all.txt
+      - diff-rb.txt
+      - diff-js.txt
 
 build:
   stage: build
@@ -106,7 +111,7 @@ build:
 lint:
   stage: test
   script:
-    - 'if [ ! -z "$CHANGED_RUBY" ]; then bundle exec standardrb $CHANGED_RUBY; fi'
+    - 'if [ "$(exec wc -c <diff-rb.txt)" -gt 1 ]; then bundle exec standardrb $(exec cat diff-rb.txt); fi' # newline is always present
   allow_failure: true
 
 test:
