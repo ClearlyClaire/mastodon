@@ -32,8 +32,8 @@ class Api::V1::Trends::TagsController < Api::BaseController
   def always_trending
     # TODO: do we need to sanitize ALWAYS_TRENDING_TAGS?
     # TODO: should we log when ALWAYS_TRENDING_TAGS includes a tag that does not exist?
-    ENV['ALWAYS_TRENDING_TAGS'].to_s.split(',')
-                                    .reduce(Tag.none) { |relation, tag_name| relation.or(Tag.where(name: tag_name)) }
+    ENV["ALWAYS_TRENDING_TAGS"].to_s.split(",")
+      .reduce(Tag.none) { |relation, tag_name| relation.or(Tag.where(name: tag_name)) }
   end
 
   # Determine the tags that will be reported as trending, overriding the
@@ -44,14 +44,14 @@ class Api::V1::Trends::TagsController < Api::BaseController
   # TODO: is that desirable? should we log a warning in that case?
   def set_tags
     @tags = if !enabled?
-              []
-            else
-              guaranteed_tags              = always_trending
-              # TODO: how does the query handle negative limits? is this necessary?
-              limit_considering_guaranteed = [0, limit_param(DEFAULT_TAGS_LIMIT) - guaranteed_tags.size].max
+      []
+    else
+      guaranteed_tags = always_trending
+      # TODO: how does the query handle negative limits? is this necessary?
+      limit_considering_guaranteed = [0, limit_param(DEFAULT_TAGS_LIMIT) - guaranteed_tags.size].max
 
-              guaranteed_tags | tags_from_trends.offset(offset_param).limit(limit_considering_guaranteed)
-            end
+      guaranteed_tags | tags_from_trends.offset(offset_param).limit(limit_considering_guaranteed)
+    end
   end
 
   # Retrieve the tags that the trending tags algorithm determines to be
