@@ -5,6 +5,7 @@ class Api::V1::Trends::TagsController < Api::BaseController
 
   after_action :insert_pagination_headers
 
+  # See also {#BaseController::limit_param}
   DEFAULT_TAGS_LIMIT = 10
 
   def index
@@ -13,6 +14,7 @@ class Api::V1::Trends::TagsController < Api::BaseController
 
   private
 
+  # @return [boolean] Whether trends are enabled
   def enabled?
     Setting.trends
   end
@@ -30,7 +32,6 @@ class Api::V1::Trends::TagsController < Api::BaseController
   def always_trending
     # TODO: do we need to sanitize ALWAYS_TRENDING_TAGS?
     # TODO: should we log when ALWAYS_TRENDING_TAGS includes a tag that does not exist?
-    # TODO: can we get the empty Relation without searching for (what we hope is) an impossible id?
     ENV['ALWAYS_TRENDING_TAGS'].to_s.split(',')
                                     .reduce(Tag.none) { |relation, tag_name| relation.or(Tag.where(name: tag_name)) }
   end
@@ -41,7 +42,6 @@ class Api::V1::Trends::TagsController < Api::BaseController
   # Note that having too many tags always trending will render {#index}
   # completely deterministic (as per {#BaseController::limit_param})!
   # TODO: is that desirable? should we log a warning in that case?
-
   def set_tags
     @tags = if !enabled?
               []
@@ -54,6 +54,10 @@ class Api::V1::Trends::TagsController < Api::BaseController
             end
   end
 
+  # Retrieve the tags that the trending tags algorithm determines to be
+  # trending. This ignores ALWAYS_TRENDING_TAGS.
+  #
+  # @return [ActiveRecord::Relation] The tags that are "actually" trending
   def tags_from_trends
     Trends.tags.query.allowed
   end
