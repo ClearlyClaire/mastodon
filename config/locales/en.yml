@@ -1160,11 +1160,14 @@ en:
       one: Something isn't quite right yet! Please review the error below
       other: Something isn't quite right yet! Please review %{count} errors below
   groups:
+    created: Created %{date}
     errors:
       unsupported_remote_role: Moderation roles are not supported for remote users yet
     members:
       one: Member
       other: Members
+    members_of: Members of group %{name}
+    moderators: Moderators
   html_validator:
     invalid_markup: 'contains invalid HTML markup: %{error}'
   imports:
