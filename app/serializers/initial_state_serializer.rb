@@ -1,10 +1,12 @@
 # frozen_string_literal: true
 
 class InitialStateSerializer < ActiveModel::Serializer
+  include RoutingHelper
+
   attributes :meta, :compose, :accounts,
              :media_attachments, :settings,
              :max_toot_chars, :poll_limits,
-             :languages
+             :languages, :server
 
   has_one :push_subscription, serializer: REST::WebPushSubscriptionSerializer
   has_one :role, serializer: REST::RoleSerializer
@@ -97,6 +99,13 @@ class InitialStateSerializer < ActiveModel::Serializer
 
   def languages
     LanguagesHelper::SUPPORTED_LOCALES.map { |(key, value)| [key, value[0], value[1]] }
+  end
+
+  def server
+    {
+      hero: instance_presenter.hero&.file&.url || instance_presenter.thumbnail&.file&.url || asset_pack_path('media/images/preview.png'),
+      description: instance_presenter.site_short_description.presence || I18n.t('about.about_mastodon_html'),
+    }
   end
 
   private
