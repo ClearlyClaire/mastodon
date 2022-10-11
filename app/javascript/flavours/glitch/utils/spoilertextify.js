@@ -1,5 +1,5 @@
 import { defineMessages } from 'react-intl';
-import emojify from 'flavours/glitch/util/emoji';
+import emojify from 'flavours/glitch/features/emoji/emoji';
 
 const messages = defineMessages({
   spoilerHidden: {
