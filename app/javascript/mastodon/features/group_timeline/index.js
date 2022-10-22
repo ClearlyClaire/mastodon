@@ -41,6 +41,7 @@ class GroupTimeline extends React.PureComponent {
 
   static contextTypes = {
     router: PropTypes.object,
+    identity: PropTypes.object,
   };
 
   static propTypes = {
@@ -79,16 +80,20 @@ class GroupTimeline extends React.PureComponent {
   componentDidMount () {
     const { dispatch } = this.props;
     const { id } = this.props.params;
+    const { signedIn } = this.context.identity;
 
     dispatch(fetchGroup(id));
     dispatch(expandGroupTimeline(id));
 
-    this.disconnect = dispatch(connectGroupStream(id));
+    if (signedIn) {
+      this.disconnect = dispatch(connectGroupStream(id));
+    }
   }
 
   componentWillReceiveProps (nextProps) {
     const { dispatch } = this.props;
     const { id } = nextProps.params;
+    const { signedIn } = this.context.identity;
 
     if (id !== this.props.params.id) {
       if (this.disconnect) {
@@ -99,7 +104,9 @@ class GroupTimeline extends React.PureComponent {
       dispatch(fetchGroup(id));
       dispatch(expandGroupTimeline(id));
 
-      this.disconnect = dispatch(connectGroupStream(id));
+      if (signedIn) {
+        this.disconnect = dispatch(connectGroupStream(id));
+      }
     }
   }
 
