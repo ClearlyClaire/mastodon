@@ -3,8 +3,7 @@
 class Api::V1::Timelines::GroupController < Api::BaseController
   include Authorization
 
-  before_action -> { doorkeeper_authorize! :read, :'read:groups' } # TODO: do we really want a new scope?
-  before_action :require_user!
+  before_action -> { authorize_if_got_token! :read, :'read:groups' } # TODO: do we really want a new scope?
   before_action :set_group
   before_action :set_statuses
 
@@ -13,7 +12,7 @@ class Api::V1::Timelines::GroupController < Api::BaseController
   def show
     render json: @statuses,
            each_serializer: REST::StatusSerializer,
-           relationships: StatusRelationshipsPresenter.new(@statuses, current_user.account_id)
+           relationships: StatusRelationshipsPresenter.new(@statuses, current_user&.account_id)
   end
 
   private
