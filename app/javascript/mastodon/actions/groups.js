@@ -197,7 +197,8 @@ export const fetchGroupsFail = (error) => ({
 
 export function fetchGroupRelationships(groupIds) {
   return (dispatch, getState) => {
-    const loadedRelationships = getState().get('group_relationships');
+    const state = getState();
+    const loadedRelationships = state.get('group_relationships');
     const newGroupIds = groupIds.filter(id => loadedRelationships.get(id, null) === null);
 
     const signedIn = !!state.getIn(['meta', 'me']);
