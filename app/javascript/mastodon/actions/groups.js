@@ -200,7 +200,9 @@ export function fetchGroupRelationships(groupIds) {
     const loadedRelationships = getState().get('group_relationships');
     const newGroupIds = groupIds.filter(id => loadedRelationships.get(id, null) === null);
 
-    if (newGroupIds.length === 0) {
+    const signedIn = !!state.getIn(['meta', 'me']);
+
+    if (!signedIn || newGroupIds.length === 0) {
       return;
     }
 
