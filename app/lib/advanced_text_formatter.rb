@@ -112,11 +112,44 @@ class AdvancedTextFormatter < TextFormatter
         end
         text_node.replace(replacement)
       end
+
+      @tree.css('spoiler-text').each do |spoiler_node|
+        # Replace each +<spoiler-text>+ node with a span which reflects
+        # it.
+        #
+        # Note that this elimanates any markup within the
+        # +<spoiler-text>+ node.
+        content = spoiler_node.content
+        elt = Nokogiri::XML::Element.new('span', document)
+        elt['property'] = 'tag:ns.1024.gdn,2022-11-11:spoiler_text'
+        elt['content'] = content
+        elt << Nokogiri::XML::Text.new(
+          encode_spoiler(content),
+          document
+        )
+        spoiler_node.replace(elt)
+      end
     end
     @tree
   end
 
   private
+
+  def encode_spoiler(text)
+    result = ''.dup
+    text.unicode_normalize(:nfkd).each_char do |char|
+      result << if /[A-Ma-m]/.match?(char)
+                  char.codepoints[0] + 13
+                elsif /[N-Zn-z]/.match?(char)
+                  char.codepoints[0] - 13
+                elsif /[[:alpha:]]/.match?(char)
+                  0xFFFD
+                else
+                  char
+                end
+    end
+    result
+  end
 
   def format_markdown(html)
     html = markdown_formatter.render(html)

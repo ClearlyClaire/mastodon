@@ -36,6 +36,18 @@ class Sanitize
       node['class'] = class_list.join(' ')
     end
 
+    ##
+    # Deletes the +property+ and +content+ properties if the value of
+    # +property+ is not a recognized IRI.
+    PROPERTY_ALLOWLIST_TRANSFORMER = lambda do |env|
+      node = env[:node]
+      return if node['property'].present? && %w(
+        tag:ns.1024.gdn,2022-11-11:spoiler_text
+      ).include?(node['property'])
+      node.remove_attribute('property')
+      node.remove_attribute('content')
+    end
+
     IMG_TAG_TRANSFORMER = lambda do |env|
       node = env[:node]
 
@@ -76,7 +88,7 @@ class Sanitize
 
       attributes: {
         'a'          => %w(href rel class title),
-        'span'       => %w(class),
+        'span'       => %w(class property content),
         'abbr'       => %w(title),
         'blockquote' => %w(cite),
         'ol'         => %w(start reversed),
@@ -97,6 +109,7 @@ class Sanitize
 
       transformers: [
         CLASS_WHITELIST_TRANSFORMER,
+        PROPERTY_ALLOWLIST_TRANSFORMER,
         IMG_TAG_TRANSFORMER,
         UNSUPPORTED_HREF_TRANSFORMER,
       ]
@@ -151,9 +164,11 @@ class Sanitize
     end
 
     MASTODON_OUTGOING ||= freeze_config MASTODON_STRICT.merge(
+      elements: MASTODON_STRICT[:elements] + %w(spoiler-text),
       attributes: merge(
         MASTODON_STRICT[:attributes],
-        'a' => %w(href rel class title target)
+        'a' => %w(href rel class title target),
+        'span' => %w(class) # do not allow manual property setting
       ),
 
       add_attributes: {},
