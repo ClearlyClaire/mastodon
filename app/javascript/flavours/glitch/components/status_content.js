@@ -1,7 +1,7 @@
 import React from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
+import { injectIntl, FormattedMessage } from 'react-intl';
 import Permalink from './permalink';
 import classnames from 'classnames';
 import Icon from 'flavours/glitch/components/icon';
@@ -62,6 +62,7 @@ const isLinkMisleading = (link) => {
   return !(textMatchesTarget(text, origin, host) || textMatchesTarget(text.toLowerCase(), origin, host));
 };
 
+@injectIntl
 export default class StatusContent extends React.PureComponent {
 
   static propTypes = {
@@ -69,6 +70,7 @@ export default class StatusContent extends React.PureComponent {
     expanded: PropTypes.bool,
     collapsed: PropTypes.bool,
     onExpandedToggle: PropTypes.func,
+    onToggleSpoilerText: PropTypes.func,
     media: PropTypes.node,
     extraMedia: PropTypes.node,
     mediaIcons: PropTypes.arrayOf(PropTypes.string),
@@ -77,6 +79,7 @@ export default class StatusContent extends React.PureComponent {
     onUpdate: PropTypes.func,
     tagLinks: PropTypes.bool,
     rewriteMentions: PropTypes.string,
+    intl: PropTypes.object.isRequired,
   };
 
   static defaultProps = {
@@ -95,6 +98,13 @@ export default class StatusContent extends React.PureComponent {
     if (!node) {
       return;
     }
+
+    [...node.querySelectorAll('.spoilertext')].forEach((elt) => {
+      elt.querySelector('button').addEventListener(
+        'click',
+        this.onSpoilerTextClick.bind(this, elt),
+      );
+    });
 
     const links = node.querySelectorAll('a');
 
@@ -182,6 +192,21 @@ export default class StatusContent extends React.PureComponent {
   }
 
   componentDidMount () {
+    const node = this.contentsNode;
+    if (node) {
+      // Replace spoiler texts with their internationalized versions.
+      [...node.querySelectorAll('.spoilertext')].forEach((elt) => {
+        this.props.onToggleSpoilerText(
+          this.props.status,
+          node,
+          elt,
+          this.props.intl,
+          elt.classList.contains('open'),
+        );
+      });
+    }
+    // The `.onToggleSpoilerText()` method actually replaces the
+    // `.spoilertext` elements, so we need to call this *after*.
     this._updateStatusLinks();
   }
 
@@ -208,6 +233,16 @@ export default class StatusContent extends React.PureComponent {
     if (this.props.parseClick) {
       this.props.parseClick(e, `/tags/${hashtag}`);
     }
+  }
+
+  onSpoilerTextClick = (spoilerElement, e) => {
+    e.preventDefault();
+    this.props.onToggleSpoilerText(
+      this.props.status,
+      this.contentsNode,
+      spoilerElement,
+      this.props.intl,
+    );
   }
 
   handleMouseDown = (e) => {

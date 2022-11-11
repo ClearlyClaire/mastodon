@@ -83,6 +83,7 @@ class Status extends ImmutablePureComponent {
     onEmbed: PropTypes.func,
     onHeightChange: PropTypes.func,
     onToggleHidden: PropTypes.func,
+    onToggleSpoilerText: PropTypes.func,
     muted: PropTypes.bool,
     hidden: PropTypes.bool,
     unread: PropTypes.bool,
@@ -499,6 +500,7 @@ class Status extends ImmutablePureComponent {
       intersectionObserverWrapper,
       onOpenVideo,
       onOpenMedia,
+      onToggleSpoilerText,
       notification,
       hidden,
       unread,
@@ -780,6 +782,7 @@ class Status extends ImmutablePureComponent {
             mediaIcons={contentMediaIcons}
             expanded={isExpanded}
             onExpandedToggle={this.handleExpandedToggle}
+            onToggleSpoilerText={onToggleSpoilerText}
             parseClick={parseClick}
             disabled={!router}
             tagLinks={settings.get('tag_misleading_links')}

@@ -408,7 +408,7 @@
         background: linear-gradient(rgba($ui-base-color, 0), rgba($ui-base-color, 1));
         pointer-events: none;
       }
-      
+
       a:hover {
         text-decoration: none;
       }
@@ -1161,5 +1161,52 @@ a.status-card.compact:hover {
   &:focus,
   &:active {
     border-color: lighten($ui-base-color, 12%);
+  }
+}
+
+.spoilertext {
+  .spoilertext--screenreader-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+  }
+
+  .spoilertext--content {
+    margin: -1px 0;
+    padding: 0 .5ch;
+    box-decoration-break: clone;
+    color: $text-on-shadow-color;
+    background: rgba($base-shadow-color, .2);
+    border: 1px $dark-text-color dashed;
+  }
+
+  &:not(.open) .spoilertext--content {
+    border-color: transparent;
+    color: transparent;
+    background: $base-shadow-color;
+    user-select: none;
+    pointer-events: none;
+  }
+
+  .spoilertext--span { white-space: nowrap }
+
+  .spoilertext--button {
+    all: unset;
+    border-radius: 0 20% 20% 0;
+    padding: 0 .5ch;
+    color: $text-on-shadow-color;
+    background: rgba($base-shadow-color, .4);
+
+    .fa {
+      font-style: normal;
+      transition: rotate .5s;
+    }
+
+    &:focus-visible .fa { rotate: 90deg }
   }
 }

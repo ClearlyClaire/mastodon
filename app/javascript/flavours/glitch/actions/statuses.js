@@ -30,6 +30,8 @@ export const STATUS_COLLAPSE = 'STATUS_COLLAPSE';
 
 export const REDRAFT = 'REDRAFT';
 
+export const STATUS_MODIFY_BODY = 'STATUS_MODIFY_BODY';
+
 export const STATUS_FETCH_SOURCE_REQUEST = 'STATUS_FETCH_SOURCE_REQUEST';
 export const STATUS_FETCH_SOURCE_SUCCESS = 'STATUS_FETCH_SOURCE_SUCCESS';
 export const STATUS_FETCH_SOURCE_FAIL    = 'STATUS_FETCH_SOURCE_FAIL';
@@ -309,5 +311,13 @@ export function toggleStatusCollapse(id, isCollapsed) {
     type: STATUS_COLLAPSE,
     id,
     isCollapsed,
+  };
+}
+
+export function modifyStatusBody(id, newBody) {
+  return {
+    type: STATUS_MODIFY_BODY,
+    id,
+    newBody,
   };
 }

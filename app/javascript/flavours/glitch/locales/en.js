@@ -34,6 +34,8 @@ const messages = {
   'settings.navbar_under': 'Navbar at the bottom (Mobile only)',
   'status.collapse': 'Collapse',
   'status.uncollapse': 'Uncollapse',
+  'status.spoilertext.hidden': '[currently hidden]',
+  'status.spoilertext.show': 'show spoiler',
 
   'media_gallery.sensitive': 'Sensitive',
 

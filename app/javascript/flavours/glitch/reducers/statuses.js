@@ -13,6 +13,7 @@ import {
   STATUS_REVEAL,
   STATUS_HIDE,
   STATUS_COLLAPSE,
+  STATUS_MODIFY_BODY,
 } from 'flavours/glitch/actions/statuses';
 import {
   TIMELINE_DELETE,
@@ -77,6 +78,8 @@ export default function statuses(state = initialState, action) {
     });
   case STATUS_COLLAPSE:
     return state.setIn([action.id, 'collapsed'], action.isCollapsed);
+  case STATUS_MODIFY_BODY:
+    return state.setIn([action.id, 'contentHtml'], action.newBody);
   case TIMELINE_DELETE:
     return deleteStatus(state, action.id, action.references);
   default:

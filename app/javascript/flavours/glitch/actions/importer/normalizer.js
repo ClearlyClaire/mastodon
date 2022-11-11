@@ -2,6 +2,7 @@ import escapeTextContentForBrowser from 'escape-html';
 import emojify from 'flavours/glitch/util/emoji';
 import { unescapeHTML } from 'flavours/glitch/util/html';
 import { autoHideCW } from 'flavours/glitch/util/content_warning';
+import spoilertextify from 'flavours/glitch/utils/spoilertextify';
 
 const domParser = new DOMParser();
 
@@ -79,8 +80,23 @@ export function normalizeStatus(status, normalOldStatus, settings) {
     const searchContent = ([spoilerText, status.content].concat((status.poll && status.poll.options) ? status.poll.options.map(option => option.title) : [])).concat(status.media_attachments.map(att => att.description)).join('\n\n').replace(/<br\s*\/?>/g, '\n').replace(/<\/p><p>/g, '\n\n');
     const emojiMap      = makeEmojiMap(normalStatus);
 
+    const contentHtml = emojify(normalStatus.content, emojiMap);
+    const statusDoc = domParser.parseFromString(
+      `<!DOCTYPE html><html>${contentHtml}`,
+      'text/html',
+    );
+    statusDoc.body.querySelectorAll(
+      'span[property="tag:ns.1024.gdn,2022-11-11:spoiler_text"]',
+    ).forEach((spoilerNode) => {
+      // Set up initial (hidden) spoilers.
+      spoilerNode.replaceWith(spoilertextify(
+        spoilerNode.getAttribute('content'),
+        { document: statusDoc },
+      ));
+    });
+
     normalStatus.search_index = domParser.parseFromString(searchContent, 'text/html').documentElement.textContent;
-    normalStatus.contentHtml  = emojify(normalStatus.content, emojiMap);
+    normalStatus.contentHtml  = statusDoc.body.innerHTML;
     normalStatus.spoilerHtml  = emojify(escapeTextContentForBrowser(spoilerText), emojiMap);
     normalStatus.hidden       = (spoilerText.length > 0 || normalStatus.sensitive) && autoHideCW(settings, spoilerText);
   }

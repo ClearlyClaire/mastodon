@@ -20,6 +20,7 @@ import Icon from 'flavours/glitch/components/icon';
 import AnimatedNumber from 'flavours/glitch/components/animated_number';
 import PictureInPicturePlaceholder from 'flavours/glitch/components/picture_in_picture_placeholder';
 import EditedTimestamp from 'flavours/glitch/components/edited_timestamp';
+import spoilertextify from 'flavours/glitch/utils/spoilertextify';
 
 export default @injectIntl
 class DetailedStatus extends ImmutablePureComponent {
@@ -34,6 +35,7 @@ class DetailedStatus extends ImmutablePureComponent {
     onOpenMedia: PropTypes.func.isRequired,
     onOpenVideo: PropTypes.func.isRequired,
     onToggleHidden: PropTypes.func,
+    onToggleSpoilerText: PropTypes.func,
     expanded: PropTypes.bool,
     measureHeight: PropTypes.bool,
     onHeightChange: PropTypes.func,
@@ -114,7 +116,7 @@ class DetailedStatus extends ImmutablePureComponent {
 
   render () {
     const status = (this.props.status && this.props.status.get('reblog')) ? this.props.status.get('reblog') : this.props.status;
-    const { expanded, onToggleHidden, settings, usingPiP, intl } = this.props;
+    const { expanded, onToggleHidden, onToggleSpoilerText, settings, usingPiP, intl } = this.props;
     const outerStyle = { boxSizing: 'border-box' };
     const { compact } = this.props;
 
@@ -305,6 +307,7 @@ class DetailedStatus extends ImmutablePureComponent {
             expanded={expanded}
             collapsed={false}
             onExpandedToggle={onToggleHidden}
+            onToggleSpoilerText={onToggleSpoilerText}
             parseClick={this.parseClick}
             onUpdate={this.handleChildUpdate}
             tagLinks={settings.get('tag_misleading_links')}
