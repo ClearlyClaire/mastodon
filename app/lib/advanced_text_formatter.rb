@@ -81,7 +81,9 @@ class AdvancedTextFormatter < TextFormatter
           extract_url_without_protocol: false
         ) do |entity|
           # Iterate over entities in this text node.
-          advance = entity[:indices].first - processed_index
+          entity_start = entity[:indices].first
+          entity_end = entity[:indices].last
+          advance = entity_start - processed_index
           if advance.positive?
             # Text node for content which precedes entity.
             replacement << Nokogiri::XML::Text.new(
@@ -100,8 +102,12 @@ class AdvancedTextFormatter < TextFormatter
             elt['kind'] = 'mention'
             elt['value'] = entity[:screen_name]
           end
+          elt << Nokogiri::XML::Text.new(
+            content[entity_start, entity_end - entity_start],
+            document
+          )
           replacement << elt
-          processed_index = entity[:indices].last
+          processed_index = entity_end
         end
         if processed_index < content.size
           # Text node for remaining content.
