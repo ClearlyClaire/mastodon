@@ -71,7 +71,7 @@ class AdvancedTextFormatter < TextFormatter
       Sanitize.node!(@tree, Sanitize::Config::MASTODON_OUTGOING)
       document = @tree.document
 
-      @tree.xpath('.//text()[not(ancestor::a)]').each do |text_node|
+      @tree.xpath('.//text()[not(ancestor::a | ancestor::code)]').each do |text_node|
         # Iterate over text elements and build up their replacements.
         content = text_node.content
         replacement = Nokogiri::XML::NodeSet.new(document)
