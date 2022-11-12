@@ -91,7 +91,7 @@ export function normalizeStatus(status, normalOldStatus, settings) {
       // Set up initial (hidden) spoilers.
       spoilerNode.replaceWith(spoilertextify(
         spoilerNode.getAttribute('content'),
-        { document: statusDoc },
+        { document: statusDoc, emojos: emojiMap },
       ));
     });
 

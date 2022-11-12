@@ -1191,6 +1191,8 @@ a.status-card.compact:hover {
     background: $base-shadow-color;
     user-select: none;
     pointer-events: none;
+
+    img { visibility: hidden }
   }
 
   .spoilertext--span { white-space: nowrap }

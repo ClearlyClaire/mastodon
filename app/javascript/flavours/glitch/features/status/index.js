@@ -240,8 +240,12 @@ class Status extends ImmutablePureComponent {
 
   handleToggleSpoilerText = (status, oldBody, spoilerElement, intl, open) => {
     spoilerElement.replaceWith(spoilertextify(
-      spoilerElement.querySelector('.spoilertext--content').textContent,
+      spoilerElement.getAttribute('data-spoilertext-content'),
       {
+        emojos: status.get('emojis').reduce((obj, emoji) => {
+          obj[`:${emoji.get('shortcode')}:`] = emoji.toJS();
+          return obj;
+        }, {}),
         intl,
         open: open == null
           ? !spoilerElement.classList.contains('open')

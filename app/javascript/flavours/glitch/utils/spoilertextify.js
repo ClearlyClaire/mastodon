@@ -1,4 +1,5 @@
 import { defineMessages } from 'react-intl';
+import emojify from 'flavours/glitch/util/emoji';
 
 const messages = defineMessages({
   spoilerHidden: {
@@ -17,9 +18,11 @@ const messages = defineMessages({
  */
 export default (text, options) => {
   const doc = options?.document || document;
+  const emojiMap = options?.emojos || {};
   const { intl, open } = options;
   const result = doc.createElement('span');
   result.className = open ? 'spoilertext open' : 'spoilertext';
+  result.setAttribute('data-spoilertext-content', text);
   if (!open) {
     const accessibleDescription = doc.createElement('span');
     accessibleDescription.className = 'spoilertext--screenreader-only';
@@ -30,6 +33,7 @@ export default (text, options) => {
   textElt.className = 'spoilertext--content';
   textElt.setAttribute('aria-hidden', open ? 'false' : 'true');
   textElt.textContent = text;
+  textElt.innerHTML = emojify(textElt.innerHTML, emojiMap);
   const togglerSpan = doc.createElement('span');
   togglerSpan.className = 'spoilertext--span';
   const togglerButton = doc.createElement('button');
