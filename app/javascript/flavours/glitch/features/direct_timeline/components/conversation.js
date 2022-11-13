@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import ImmutablePureComponent from 'react-immutable-pure-component';
-import StatusContent from 'flavours/glitch/components/status_content';
+import StatusContentContainer from 'flavours/glitch/containers/status_content_container';
 import AttachmentList from 'flavours/glitch/components/attachment_list';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import DropdownMenuContainer from 'flavours/glitch/containers/dropdown_menu_container';
@@ -199,7 +199,7 @@ class Conversation extends ImmutablePureComponent {
               </div>
             </div>
 
-            <StatusContent
+            <StatusContentContainer
               status={lastStatus}
               parseClick={this.parseClick}
               expanded={isExpanded}

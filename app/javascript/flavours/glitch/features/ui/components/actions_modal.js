@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import ImmutablePureComponent from 'react-immutable-pure-component';
-import StatusContent from 'flavours/glitch/components/status_content';
+import StatusContentContainer from 'flavours/glitch/containers/status_content_container';
 import Avatar from 'flavours/glitch/components/avatar';
 import RelativeTimestamp from 'flavours/glitch/components/relative_timestamp';
 import DisplayName from 'flavours/glitch/components/display_name';
@@ -73,7 +73,7 @@ export default class ActionsModal extends ImmutablePureComponent {
           </a>
         </div>
 
-        <StatusContent status={this.props.status} />
+        <StatusContentContainer status={this.props.status} />
       </div>
     );
 

@@ -4,7 +4,7 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 import PropTypes from 'prop-types';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import Button from 'flavours/glitch/components/button';
-import StatusContent from 'flavours/glitch/components/status_content';
+import StatusContentContainer from 'flavours/glitch/containers/status_content_container';
 import Avatar from 'flavours/glitch/components/avatar';
 import RelativeTimestamp from 'flavours/glitch/components/relative_timestamp';
 import DisplayName from 'flavours/glitch/components/display_name';
@@ -102,7 +102,7 @@ class BoostModal extends ImmutablePureComponent {
               </a>
             </div>
 
-            <StatusContent status={status} />
+            <StatusContentContainer status={status} />
 
             {status.get('media_attachments').size > 0 && (
               <AttachmentList

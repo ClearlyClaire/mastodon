@@ -1,7 +1,8 @@
 import React from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
+import ImmutablePureComponent from 'react-immutable-pure-component';
 import PropTypes from 'prop-types';
-import { injectIntl, FormattedMessage } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import Permalink from './permalink';
 import classnames from 'classnames';
 import Icon from 'flavours/glitch/components/icon';
@@ -62,8 +63,9 @@ const isLinkMisleading = (link) => {
   return !(textMatchesTarget(text, origin, host) || textMatchesTarget(text.toLowerCase(), origin, host));
 };
 
-@injectIntl
-export default class StatusContent extends React.PureComponent {
+const listening = new WeakSet();
+
+export default class StatusContent extends ImmutablePureComponent {
 
   static propTypes = {
     status: ImmutablePropTypes.map.isRequired,
@@ -91,6 +93,29 @@ export default class StatusContent extends React.PureComponent {
     hidden: true,
   };
 
+  /** Define listeners for inline spoiler text elements. */
+  _defineSpoilerTextListeners () {
+    const node = this.contentsNode;
+    const { onToggleSpoilerText } = this.props;
+    if (node && onToggleSpoilerText) {
+      [...node.querySelectorAll('.spoilertext')].forEach((elt) => {
+        if (listening.has(elt)) return;
+        elt.querySelector('button').addEventListener(
+          'click',
+          (e) => {
+            // Ordinarily, calling the `onSpoilerTextClict(elt)` method
+            // will trigger a rerender, but it may not in the case of
+            // modals. This means we may need to do a manual redefining
+            // of spoiler text listeners.
+            this.onSpoilerTextClick(elt, e);
+            this._defineSpoilerTextListeners();
+          },
+        );
+        listening.add(elt);
+      });
+    }
+  }
+
   _updateStatusLinks () {
     const node = this.contentsNode;
     const { tagLinks, rewriteMentions } = this.props;
@@ -98,13 +123,6 @@ export default class StatusContent extends React.PureComponent {
     if (!node) {
       return;
     }
-
-    [...node.querySelectorAll('.spoilertext')].forEach((elt) => {
-      elt.querySelector('button').addEventListener(
-        'click',
-        this.onSpoilerTextClick.bind(this, elt),
-      );
-    });
 
     const links = node.querySelectorAll('a');
 
@@ -193,10 +211,12 @@ export default class StatusContent extends React.PureComponent {
 
   componentDidMount () {
     const node = this.contentsNode;
-    if (node) {
+    const { onToggleSpoilerText } = this.props;
+    if (node && onToggleSpoilerText) {
       // Replace spoiler texts with their internationalized versions.
       [...node.querySelectorAll('.spoilertext')].forEach((elt) => {
-        this.props.onToggleSpoilerText(
+        if (node.querySelector('.spoilertext--button').title) return;
+        onToggleSpoilerText(
           this.props.status,
           node,
           elt,
@@ -208,10 +228,12 @@ export default class StatusContent extends React.PureComponent {
     // The `.onToggleSpoilerText()` method actually replaces the
     // `.spoilertext` elements, so we need to call this *after*.
     this._updateStatusLinks();
+    this._defineSpoilerTextListeners();
   }
 
   componentDidUpdate () {
     this._updateStatusLinks();
+    this._defineSpoilerTextListeners();
     if (this.props.onUpdate) this.props.onUpdate();
   }
 

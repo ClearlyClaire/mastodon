@@ -33,7 +33,6 @@ import {
   editStatus,
   hideStatus,
   revealStatus,
-  modifyStatusBody,
 } from 'flavours/glitch/actions/statuses';
 import { initMuteModal } from 'flavours/glitch/actions/mutes';
 import { initBlockModal } from 'flavours/glitch/actions/blocks';
@@ -53,7 +52,6 @@ import { attachFullscreenListener, detachFullscreenListener, isFullscreen } from
 import { autoUnfoldCW } from 'flavours/glitch/util/content_warning';
 import { textForScreenReader, defaultMediaVisibility } from 'flavours/glitch/components/status';
 import Icon from 'flavours/glitch/components/icon';
-import spoilertextify from 'flavours/glitch/utils/spoilertextify';
 
 const messages = defineMessages({
   deleteConfirm: { id: 'confirmations.delete.confirm', defaultMessage: 'Delete' },
@@ -236,26 +234,6 @@ class Status extends ImmutablePureComponent {
     } else if (this.props.status.get('spoiler_text')) {
       this.setExpansion(!this.state.isExpanded);
     }
-  }
-
-  handleToggleSpoilerText = (status, oldBody, spoilerElement, intl, open) => {
-    spoilerElement.replaceWith(spoilertextify(
-      spoilerElement.getAttribute('data-spoilertext-content'),
-      {
-        emojos: status.get('emojis').reduce((obj, emoji) => {
-          obj[`:${emoji.get('shortcode')}:`] = emoji.toJS();
-          return obj;
-        }, {}),
-        intl,
-        open: open == null
-          ? !spoilerElement.classList.contains('open')
-          : !!open,
-      },
-    ));
-    this.props.dispatch(modifyStatusBody(
-      status.get('id'),
-      oldBody.innerHTML,
-    ));
   }
 
   handleToggleMediaVisibility = () => {
@@ -623,7 +601,6 @@ class Status extends ImmutablePureComponent {
                   settings={settings}
                   onOpenVideo={this.handleOpenVideo}
                   onOpenMedia={this.handleOpenMedia}
-                  onToggleSpoilerText={this.handleToggleSpoilerText}
                   expanded={isExpanded}
                   onToggleHidden={this.handleToggleHidden}
                   domain={domain}

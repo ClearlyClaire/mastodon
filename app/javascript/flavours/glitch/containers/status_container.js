@@ -24,7 +24,6 @@ import {
   hideStatus,
   revealStatus,
   editStatus,
-  modifyStatusBody,
 } from 'flavours/glitch/actions/statuses';
 import {
   initAddFilter,
@@ -43,7 +42,6 @@ import { showAlertForError } from '../actions/alerts';
 import AccountContainer from 'flavours/glitch/containers/account_container';
 import Spoilers from '../components/spoilers';
 import Icon from 'flavours/glitch/components/icon';
-import spoilertextify from 'flavours/glitch/utils/spoilertextify';
 
 const messages = defineMessages({
   deleteConfirm: { id: 'confirmations.delete.confirm', defaultMessage: 'Delete' },
@@ -232,26 +230,6 @@ const mapDispatchToProps = (dispatch, { intl, contextType }) => ({
     } else {
       dispatch(hideStatus(status.get('id')));
     }
-  },
-
-  onToggleSpoilerText (status, oldBody, spoilerElement, intl, open) {
-    spoilerElement.replaceWith(spoilertextify(
-      spoilerElement.getAttribute('data-spoilertext-content'),
-      {
-        emojos: status.get('emojis').reduce((obj, emoji) => {
-          obj[`:${emoji.get('shortcode')}:`] = emoji.toJS();
-          return obj;
-        }, {}),
-        intl,
-        open: open == null
-          ? !spoilerElement.classList.contains('open')
-          : !!open,
-      },
-    ));
-    dispatch(modifyStatusBody(
-      status.get('id'),
-      oldBody.innerHTML,
-    ));
   },
 
   deployPictureInPicture (status, type, mediaProps) {

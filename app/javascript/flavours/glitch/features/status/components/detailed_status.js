@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import Avatar from 'flavours/glitch/components/avatar';
 import DisplayName from 'flavours/glitch/components/display_name';
-import StatusContent from 'flavours/glitch/components/status_content';
+import StatusContentContainer from 'flavours/glitch/containers/status_content_container';
 import MediaGallery from 'flavours/glitch/components/media_gallery';
 import AttachmentList from 'flavours/glitch/components/attachment_list';
 import { Link } from 'react-router-dom';
@@ -35,7 +35,6 @@ class DetailedStatus extends ImmutablePureComponent {
     onOpenMedia: PropTypes.func.isRequired,
     onOpenVideo: PropTypes.func.isRequired,
     onToggleHidden: PropTypes.func,
-    onToggleSpoilerText: PropTypes.func,
     expanded: PropTypes.bool,
     measureHeight: PropTypes.bool,
     onHeightChange: PropTypes.func,
@@ -116,7 +115,7 @@ class DetailedStatus extends ImmutablePureComponent {
 
   render () {
     const status = (this.props.status && this.props.status.get('reblog')) ? this.props.status.get('reblog') : this.props.status;
-    const { expanded, onToggleHidden, onToggleSpoilerText, settings, usingPiP, intl } = this.props;
+    const { expanded, onToggleHidden, settings, usingPiP, intl } = this.props;
     const outerStyle = { boxSizing: 'border-box' };
     const { compact } = this.props;
 
@@ -299,7 +298,7 @@ class DetailedStatus extends ImmutablePureComponent {
             <DisplayName account={status.get('account')} localDomain={this.props.domain} />
           </a>
 
-          <StatusContent
+          <StatusContentContainer
             status={status}
             media={contentMedia}
             extraMedia={extraMedia}
@@ -307,7 +306,6 @@ class DetailedStatus extends ImmutablePureComponent {
             expanded={expanded}
             collapsed={false}
             onExpandedToggle={onToggleHidden}
-            onToggleSpoilerText={onToggleSpoilerText}
             parseClick={this.parseClick}
             onUpdate={this.handleChildUpdate}
             tagLinks={settings.get('tag_misleading_links')}

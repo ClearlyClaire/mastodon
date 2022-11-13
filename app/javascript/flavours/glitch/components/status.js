@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import StatusPrepend from './status_prepend';
 import StatusHeader from './status_header';
 import StatusIcons from './status_icons';
-import StatusContent from './status_content';
+import StatusContentContainer from 'flavours/glitch/containers/status_content_container';
 import StatusActionBar from './status_action_bar';
 import AttachmentList from './attachment_list';
 import Card from '../features/status/components/card';
@@ -775,14 +775,13 @@ class Status extends ImmutablePureComponent {
               settings={settings.get('status_icons')}
             />
           </header>
-          <StatusContent
+          <StatusContentContainer
             status={status}
             media={contentMedia}
             extraMedia={extraMedia}
             mediaIcons={contentMediaIcons}
             expanded={isExpanded}
             onExpandedToggle={this.handleExpandedToggle}
-            onToggleSpoilerText={onToggleSpoilerText}
             parseClick={parseClick}
             disabled={!router}
             tagLinks={settings.get('tag_misleading_links')}
