@@ -123,7 +123,8 @@ group :test do
   gem 'rspec-sidekiq', '~> 3.1'
   gem 'simplecov', '~> 0.21', require: false
   gem 'webmock', '~> 3.18'
-  gem 'rspec_junit_formatter', '~> 0.5'
+  gem 'rspec_junit_formatter', '~> 0.6'
+  gem 'rack-test', '~> 2.0'
 end
 
 group :development do
@@ -152,7 +153,6 @@ end
 
 gem 'concurrent-ruby', require: false
 gem 'connection_pool', require: false
-
 gem 'xorcist', '~> 1.1'
 
 gem 'hcaptcha', '~> 7.1'
