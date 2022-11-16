@@ -48,6 +48,7 @@ before_script:
   - apt-get update -q && apt-get install -yqq git libicu-dev libidn11-dev nodejs
   - corepack enable && yarn set version latest
   - bundle config set path 'vendor'
+  - bundle config set deployment 'true'
   - bundle config without 'development production'
   - ruby -v
   - bundle install -j $(nproc)
