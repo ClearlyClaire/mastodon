@@ -101,6 +101,7 @@ diff:
 build:
   stage: build
   script:
+    - ./bin/rails branding:generate_app_icons # ew
     - ./bin/rails assets:precompile
   artifacts:
     name: assets
