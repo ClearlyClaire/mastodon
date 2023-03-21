@@ -19,7 +19,10 @@ namespace :assets do
 end
 
 if Rake::Task.task_defined?('assets:precompile')
-  Rake::Task['assets:precompile'].enhance do
+  # Rake::Task.enhance accepts prerequisites as an argument, and postrequisites
+  # as a block; this will cause 'branding:generate_app_icons' to run *before*
+  # 'assets:precompile', and the code in the block to run *after*
+  Rake::Task['assets:precompile'].enhance ['branding:generate_app_icons'] do
     Webpacker.manifest.refresh
     Rake::Task['assets:generate_static_pages'].invoke
   end
