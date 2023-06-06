@@ -6,21 +6,56 @@ class PostStatusService < BaseService
 
   MIN_SCHEDULE_OFFSET = 5.minutes.freeze
 
-  # Post a text status update, fetch and notify remote users mentioned
+  # Validate and, if appropriate, post or schedule a text status update,
+  # fetching and notifying any mentioned remote users. If the new status is
+  # in reply to an account the user is not already following, make a note of
+  # that for account recommendation purposes.
+  #
+  # @note It is invalid to create a post with media attachments and a poll at
+  #   the same time.
+  #
+  # @note Attempting to schedule a status in the past will simply post the
+  #   status immediately.
+  #
+  # @note This is undocumented in the upstream API documentation, but
+  #   attempting to create a status with limited visibility is allowed.
+  #   That is to say, sending a POST request to the status creation endpoint
+  #   with the visibility attribute set to "limited" will create a status
+  #   with the (undocumented) "limited" visibility! The implication of this
+  #   are nonobvious, and, frankly, not at all useful; see {Status#visibility}
+  #   for the details.
+  #
   # @param [Account] account Account from which to post
-  # @param [Hash] options
-  # @option [String] :text Message
-  # @option [Status] :thread Optional status to reply to
-  # @option [Boolean] :sensitive
-  # @option [String] :visibility
-  # @option [String] :spoiler_text
-  # @option [String] :language
-  # @option [String] :scheduled_at
-  # @option [Hash] :poll Optional poll to attach
-  # @option [Enumerable] :media_ids Optional array of media IDs to attach
-  # @option [Doorkeeper::Application] :application
-  # @option [String] :idempotency Optional idempotency key
-  # @option [Boolean] :with_rate_limit
+  # @param [Hash] options Options hash
+  # @option options [String] :text Message to post. Defaults to the empty
+  #   string, unless there is nonblank spoiler text, in which case a single
+  #   period is used for text posts, or an appropriate emoji for media
+  # @option options [Status] :thread Optional status to reply to
+  # @option options [Boolean] :sensitive Optional; forced to true if
+  #   spoiler_text is present. Defaults to the user's default post sensitivity
+  #   setting
+  # @option options [String] :visibility Optional; if present, SHOULD be one of
+  #   "public", "unlisted", "private", or "direct", but see {Status#visibility}.
+  #   Defaults to the user's default post privacy.
+  # @option options [String] :spoiler_text Optional content warning
+  # @option options [String] :language Optional two-letter language code. If
+  #   blank, invalid, or unknown to the backend, defaults to the user's default
+  #   post language if it exists, and then to the default locale
+  # @option options [String] :scheduled_at Optional; if present, should be a
+  #   valid timestamp, and should refer to a time at least {MIN_SCHEDULE_OFFSET}
+  #   into the future. (If determined to be scheduled in the past, the status
+  #   will be created immediately!)
+  # @option options [Hash] :poll Optional poll to attach. Invalid to be present
+  #   when media attachments are also present
+  # @option options [Enumerable] :media_ids Optional array of media IDs to
+  #   attach. Invalid to be present when a poll is also present
+  # @option options [Doorkeeper::Application] :application Optional application
+  #   the status was posted from
+  # @option options [String] :idempotency Optional idempotency key, preventing
+  #   this status from being created if a status with this key already exists
+  # @option options [Boolean] :with_rate_limit Strictly optional, but should be
+  #   forced to true inside a controller. Can be safely ignored if, for
+  #   example, creating a status as part of a test
   # @return [Status]
   def call(account, options = {})
     @account     = account
@@ -60,12 +95,17 @@ class PostStatusService < BaseService
      end
     end
     @sensitive    = (@options[:sensitive].nil? ? @account.user&.setting_default_sensitive : @options[:sensitive]) || @options[:spoiler_text].present?
+
+    if !visibility_valid?
+      raise Mastodon::ValidationError, I18n.t('statuses.validations.visibility', visibility: @options[:visibility])
+    end
+
     @visibility   = @options[:visibility] || @account.user&.setting_default_privacy
     @visibility   = :unlisted if @visibility&.to_sym == :public && @account.silenced?
     @scheduled_at = @options[:scheduled_at]&.to_datetime
     @scheduled_at = nil if scheduled_in_the_past?
   rescue ArgumentError
-    raise ActiveRecord::RecordInvalid
+    raise Mastodon::ValidationError, I18n.t('statuses.validations.scheduled_at', datetime: @options[:scheduled_at])
   end
 
   def process_status!
@@ -114,7 +154,8 @@ class PostStatusService < BaseService
       return
     end
 
-    raise Mastodon::ValidationError, I18n.t('media_attachments.validations.too_many') if @options[:media_ids].size > 4 || @options[:poll].present?
+    raise Mastodon::ValidationError, I18n.t('media_attachments.validations.poll') if @options[:poll].present?
+    raise Mastodon::ValidationError, I18n.t('media_attachments.validations.too_many') if @options[:media_ids].size > 4
 
     @media = @account.media_attachments.where(status_id: nil).where(id: @options[:media_ids].take(4).map(&:to_i))
 
@@ -158,6 +199,10 @@ class PostStatusService < BaseService
     @scheduled_at.present? && @scheduled_at <= Time.now.utc + MIN_SCHEDULE_OFFSET
   end
 
+  # If the status was made in reply to an account the user is not already
+  # following, increase the number of recorded interactions that user has had
+  # with the author of the replied status, for account recommendation purposes.
+  # @return void
   def bump_potential_friendship!
     return if !@status.reply? || @account.id == @status.in_reply_to_account_id
     ActivityTracker.increment('activity:interactions')
@@ -204,5 +249,18 @@ class PostStatusService < BaseService
       options_hash[:idempotency]     = nil
       options_hash[:with_rate_limit] = false
     end
+  end
+
+  # If a visibility is present in the options hash, ensure it represents a
+  # proper status visibility
+  # @example Behaviors that are implicitly specified by Mastodon
+  #   @options[:visibility] = nil; visibility_vaild?              # => true
+  #   @options[:visibility] = ""; visibility_vaild?               # => true
+  #   @options[:visibility] = "         "; visibility_vaild?      # => true
+  #   @options[:visibility] = "antohusathue"; visibility_invalid? # => true
+  #   @options[:visibility] = "limited"; visibility_vaild?        # => true
+  # @return [Boolean]
+  def visibility_valid?
+    @options[:visibility].nil? || @options[:visibility].blank? || Status.visibilities.key?(@options[:visibility])
   end
 end

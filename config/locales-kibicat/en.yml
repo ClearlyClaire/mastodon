@@ -1,2 +1,9 @@
 ---
 en:
+  media_attachments:
+    validations:
+      poll: Cannot attach media and polls to the same status
+  statuses:
+    validations:
+      scheduled_at: 'Invalid scheduled datetime "%{datetime}"'
+      visibility: 'Invalid status visibility "%{visibility}"'
