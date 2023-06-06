@@ -50,6 +50,51 @@ class Status < ApplicationRecord
 
   update_index('statuses', :proper)
 
+  # @!attribute [rw] status
+  #   Status visibility affects the audience of a post, its federation
+  #   behavior, and what interactions are allowed on the post.
+  #
+  #   A public post is sent to the public timeline; remote instances with their
+  #   own public timelines will also send the post to them. In addition, public
+  #   posts are sent to following users' home timelines. Any user may see a
+  #   public post, and depending on instance configuration, the post may be
+  #   visible via a permalink without any form of user authentication.
+  #
+  #   An unlisted post is not sent to public timelines, but otherwise has the
+  #   same behavior as a public post.
+  #
+  #   A private post is only visible to following users. Consequently, it
+  #   cannot be boosted, and its permalink is always guarded by user
+  #   authentication.
+  #
+  #   A direct post is a direct message (DM); it is only visible to mentioned
+  #   accounts, and will additionally be sent to the users' direct timelines.
+  #   Its behavior is otherwise like that of a private post.
+  #
+  #   The "limited" visibility is for the visibility of Google+-like circles,
+  #   which ActivityPub strictly supports, and which some Mastodon-compatible
+  #   software does curretly use. As such posts would otherwise have to be
+  #   interpreted as DMs, the limited visibility was created alongside the
+  #   ability to create "silent" mentions, so that a post may explicitly
+  #   specify its entire audience in its mentions without necessarily notifying
+  #   those mentioned users, and without sending the post to any direct
+  #   timelines. The behavior is otherwise like that of a private post;
+  #   limited visibility posts are even serialized to clients as if they were
+  #   private!
+  #
+  #   @see https://github.com/mastodon/mastodon/pull/8950 Mastodon PR #8950:
+  #     Improve support for aspects/circles
+  #
+  #   @note In official upstream documentation, the limited visibility is
+  #     undocumented. While the upstream status creation API allows creating
+  #     limited-visibility posts (!), it does not support creating silent
+  #     mentions, limiting the utility of this allowance.
+  #
+  #   @todo Document under what conditions replies are sent to the home
+  #     timeline.
+  #
+  #   @return [:public, :unlisted, :private, :direct, :limited] The status
+  #     visibility
   enum visibility: [:public, :unlisted, :private, :direct, :limited], _suffix: :visibility
 
   belongs_to :application, class_name: 'Doorkeeper::Application', optional: true
