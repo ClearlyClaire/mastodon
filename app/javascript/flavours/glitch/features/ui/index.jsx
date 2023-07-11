@@ -167,6 +167,7 @@ class SwitchingColumnsArea extends PureComponent {
   render () {
     const { children, mobile } = this.props;
     const { signedIn } = this.context.identity;
+    const pathName = this.props.location.pathname;
 
     let redirect;
 
@@ -174,7 +175,7 @@ class SwitchingColumnsArea extends PureComponent {
       if (mobile) {
         redirect = <Redirect from='/' to='/home' exact />;
       } else {
-        redirect = <Redirect from='/' to='/getting-started' exact />;
+        redirect = <Redirect from='/' to='/deck/getting-started' exact />;
       }
     } else if (singleUserMode && owner && initialState?.accounts[owner]) {
       redirect = <Redirect from='/' to={`/@${initialState.accounts[owner].username}`} exact />;
@@ -188,6 +189,9 @@ class SwitchingColumnsArea extends PureComponent {
       <ColumnsAreaContainer ref={this.setRef} singleColumn={mobile}>
         <WrappedSwitch>
           {redirect}
+
+          {mobile ? <Redirect from='/deck' to='/home' exact /> : null}
+          {mobile && pathName.startsWith('/deck/') ? <Redirect from={pathName} to={pathName.slice(5)} /> : null}
 
           <WrappedRoute path='/getting-started' component={GettingStarted} content={children} />
           <WrappedRoute path='/keyboard-shortcuts' component={KeyboardShortcuts} content={children} />
