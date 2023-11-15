@@ -15,10 +15,11 @@ import Permalink from './permalink';
 import { RelativeTimestamp } from './relative_timestamp';
 
 
+
 const messages = defineMessages({
   follow: { id: 'account.follow', defaultMessage: 'Follow' },
   unfollow: { id: 'account.unfollow', defaultMessage: 'Unfollow' },
-  requested: { id: 'account.requested', defaultMessage: 'Awaiting approval. Click to cancel follow request' },
+  requested: { id: 'account.requested', defaultMessage: 'Awaiting approval' },
   unblock: { id: 'account.unblock', defaultMessage: 'Unblock @{name}' },
   unmute: { id: 'account.unmute', defaultMessage: 'Unmute @{name}' },
   mute_notifications: { id: 'account.mute_notifications', defaultMessage: 'Mute notifications from @{name}' },
@@ -73,16 +74,7 @@ class Account extends ImmutablePureComponent {
   };
 
   render () {
-    const {
-      account,
-      hidden,
-      intl,
-      onActionClick,
-      actionIcon,
-      actionTitle,
-      defaultAction,
-      size,
-    } = this.props;
+    const { account, intl, hidden, onActionClick, actionIcon, actionTitle, defaultAction, size } = this.props;
 
     if (!account) {
       return (
@@ -108,8 +100,8 @@ class Account extends ImmutablePureComponent {
 
     let buttons;
 
-    if (onActionClick) {
-      if (actionIcon) {
+    if (actionIcon) {
+      if (onActionClick) {
         buttons = <IconButton icon={actionIcon} title={actionTitle} onClick={this.handleAction} />;
       }
     } else if (account.get('id') !== me && account.get('relationship', null) !== null) {
@@ -157,11 +149,10 @@ class Account extends ImmutablePureComponent {
             {mute_expires_at}
             <DisplayName account={account} />
           </Permalink>
-          {buttons ?
-            <div className='account__relationship'>
-              {buttons}
-            </div>
-            : null}
+
+          <div className='account__relationship'>
+            {buttons}
+          </div>
         </div>
       </div>
     );
