@@ -2,10 +2,6 @@
 
 module Paperclip
   class LazyThumbnail < Paperclip::Processor
-    GIF_MAX_FPS = 60
-    GIF_MAX_FRAMES = 3000
-    GIF_PALETTE_COLORS = 32
-
     ALLOWED_FIELDS = %w(
       icc-profile-data
     ).freeze
@@ -37,35 +33,7 @@ module Paperclip
 
       dst = TempfileFactory.new.generate([@basename, @format ? ".#{@format}" : @current_format].join)
 
-      if preserve_animation?
-        if @target_geometry.nil? || (@current_geometry.width <= @target_geometry.width && @current_geometry.height <= @target_geometry.height)
-          target_width = 'iw'
-          target_height = 'ih'
-        else
-          scale = [@target_geometry.width.to_f / @current_geometry.width, @target_geometry.height.to_f / @current_geometry.height].min
-          target_width = (@current_geometry.width * scale).round
-          target_height = (@current_geometry.height * scale).round
-        end
-
-        # The only situation where we use crop on GIFs is cropping them to a square
-        # aspect ratio, such as for avatars, so this is the only special case we
-        # implement. If cropping ever becomes necessary for other situations, this will
-        # need to be expanded.
-        crop_width = crop_height = [target_width, target_height].min if @target_geometry&.square?
-
-        filter = begin
-          if @crop
-            "scale=#{target_width}:#{target_height}:force_original_aspect_ratio=increase,crop=#{crop_width}:#{crop_height}"
-          else
-            "scale=#{target_width}:#{target_height}:force_original_aspect_ratio=decrease"
-          end
-        end
-
-        command = Terrapin::CommandLine.new(Rails.configuration.x.ffmpeg_binary, '-nostdin -i :source -map_metadata -1 -fpsmax :max_fps -frames:v :max_frames -filter_complex :filter -y :destination', logger: Paperclip.logger)
-        command.run({ source: @file.path, filter: "#{filter},split[a][b];[a]palettegen=max_colors=#{GIF_PALETTE_COLORS}[p];[b][p]paletteuse=dither=bayer", max_fps: GIF_MAX_FPS, max_frames: GIF_MAX_FRAMES, destination: dst.path })
-      else
-        transformed_image.write_to_file(dst.path, **save_options)
-      end
+      transformed_image.write_to_file(dst.path, **save_options)
 
       dst
     rescue Terrapin::ExitStatusError => e
@@ -96,7 +64,7 @@ module Paperclip
           end
         end
       else
-        Vips::Image.thumbnail(@file.path, @target_geometry.width, height: @target_geometry.height, **thumbnail_options).mutate do |mutable|
+        Vips::Image.thumbnail(preserve_animation? ? "#{@file.path}[n=-1]" : @file.path, @target_geometry.width, height: @target_geometry.height, **thumbnail_options).mutate do |mutable|
           (mutable.get_fields - ALLOWED_FIELDS).each do |field|
             mutable.remove!(field)
           end
